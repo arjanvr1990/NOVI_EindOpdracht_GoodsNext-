@@ -16,7 +16,7 @@ public class ProductController {
     @GetMapping("/products")
     public ResponseEntity<String> getAllProducts() {
 
-        // Return een String met een 200 status
+
         return ResponseEntity.ok("products");
 
     }
@@ -24,7 +24,7 @@ public class ProductController {
     @GetMapping("/products/{id}")
     public ResponseEntity<String> getProduct(@PathVariable("id") int id) {
 
-        // return een String met een 200 status
+
         return ResponseEntity.ok("product with id: " + id);
 
     }
@@ -32,8 +32,7 @@ public class ProductController {
     @PostMapping("/products")
     public ResponseEntity<String> addProduct(@RequestBody String product) {
 
-        // Return een String met een 201 status
-        //De null van created zal over een paar weken vervangen worden door een gegenereerde url.
+
         return ResponseEntity.created(null).body("product");
 
     }
