@@ -1,4 +1,4 @@
-package com.arjanvanraamsdonk.goodsnext.model;
+package com.arjanvanraamsdonk.goodsnext.models;
 
 import jakarta.persistence.*;
 
@@ -20,6 +20,21 @@ public class Product {
     private Boolean productAvailability;
 
     private String productImg;
+
+    public Product(
+            Long productId,
+            String productName,
+            String productDescription,
+            Double productPrice,
+            Boolean productAvailability,
+            String productImg) {
+        this.productId = productId;
+        this.productName = productName;
+        this.productDescription = productDescription;
+        this.productPrice = productPrice;
+        this.productAvailability = productAvailability;
+        this.productImg = productImg;
+    }
 
 
     public Long getProductId() {return productId;}

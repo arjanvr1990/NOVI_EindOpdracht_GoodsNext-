@@ -1,7 +1,7 @@
 package com.arjanvanraamsdonk.goodsnext.service;
 
 
-import com.arjanvanraamsdonk.goodsnext.model.Product;
+import com.arjanvanraamsdonk.goodsnext.models.Product;
 import com.arjanvanraamsdonk.goodsnext.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

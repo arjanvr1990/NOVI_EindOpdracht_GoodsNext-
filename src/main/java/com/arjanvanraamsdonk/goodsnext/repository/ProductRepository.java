@@ -1,7 +1,7 @@
 package com.arjanvanraamsdonk.goodsnext.repository;
 
 
-import com.arjanvanraamsdonk.goodsnext.model.Product;
+import com.arjanvanraamsdonk.goodsnext.models.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
