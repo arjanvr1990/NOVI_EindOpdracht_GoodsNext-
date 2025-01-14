@@ -8,7 +8,7 @@ public class Product {
     @Id
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long productId;
+    private Long id;
 
     private String productName;
 
@@ -28,7 +28,7 @@ public class Product {
             Double productPrice,
             Boolean productAvailability,
             String productImg) {
-        this.productId = productId;
+        this.id = productId;
         this.productName = productName;
         this.productDescription = productDescription;
         this.productPrice = productPrice;
@@ -37,27 +37,52 @@ public class Product {
     }
 
 
-    public Long getProductId() {return productId;}
+    public Long getId() {
+        return id;
+    }
 
-    public void setProductId() {this.productId = productId;}
+    public void setId(Long productId) {
+        this.id = productId;
+    }
 
-    public String getProductName() {return productName;}
+    public String getProductName() {
+        return productName;
+    }
 
-    public void setProductName() {this.productName = productName;}
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
 
-    public String getProductDescription() {return productDescription;}
+    public String getProductDescription() {
+        return productDescription;
+    }
 
-    public void setProductDescription() {this.productDescription = productDescription;}
+    public void setProductDescription(String productDescription) {
+        this.productDescription = productDescription;
+    }
 
-    public  Double getProductPrice() {return productPrice;}
+    public Double getProductPrice() {
+        return productPrice;
+    }
 
-    public void setProductPrice() {this.productPrice = productPrice;}
+    public void setProductPrice(Double productPrice) {
+        this.productPrice = productPrice;
+    }
 
-    public Boolean getProductAvailability() {return productAvailability;}
+    public Boolean getProductAvailability() {
+        return productAvailability;
+    }
 
-    public void setProductAvailability() {this.productAvailability = productAvailability;}
+    public void setProductAvailability(Boolean productAvailability) {
+        this.productAvailability = productAvailability;
+    }
 
-    public String getProductImg() {return productImg;}
+    public String getProductImg() {
+        return productImg;
+    }
 
-    public void setProductImg() {this.productImg = productImg;}
+    public void setProductImg(String productImg) {
+        this.productImg = productImg;
+    }
+
 }
