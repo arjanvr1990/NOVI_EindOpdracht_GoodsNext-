@@ -30,14 +30,14 @@ public class ProductController {
 
 
         } else {
-            products = productRepository.findAllProductsByBrandEqualsIgnoreCase (productName);
+            products = productRepository.findAllProductsByProductNameEqualsIgnoreCase(productName);
         }
 
         return ResponseEntity.ok().body(products);
 
     }
 
-    @GetMapping("/televisions/{id}")
+    @GetMapping("/products/{id}")
     public ResponseEntity<Product> getTelevision(@PathVariable("id") Long id) {
 
         Optional<Product> television = productRepository.findById(id);
