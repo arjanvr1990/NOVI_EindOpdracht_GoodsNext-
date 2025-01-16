@@ -25,55 +25,87 @@ public class ShopService {
         this.contactInfoService = contactInfoService;
     }
 
-    // Haal alle shops op en vertaal naar ShopDto's
     public List<ShopDto> getAllShops() {
         List<Shop> shopList = shopRepository.findAll();
         List<ShopDto> shopDtoList = new ArrayList<>();
-
         for (Shop shop : shopList) {
-            ShopDto dto = transferToDto(shop);
-            shopDtoList.add(dto);
+            shopDtoList.add(transferToDto(shop));
         }
         return shopDtoList;
     }
 
-    // Haal alle shops op met een specifieke naam en vertaal naar ShopDto's
     public List<ShopDto> getAllShopsByName(String shopName) {
         List<Shop> shopList = shopRepository.findAllShopsByShopNameEqualsIgnoreCase(shopName);
         List<ShopDto> shopDtoList = new ArrayList<>();
-
         for (Shop shop : shopList) {
-            ShopDto dto = transferToDto(shop);
-            shopDtoList.add(dto);
+            shopDtoList.add(transferToDto(shop));
         }
         return shopDtoList;
     }
 
-    // Haal één shop op via ID en vertaal naar een ShopDto
     public ShopDto getShopById(Long id) {
         Optional<Shop> shopOptional = shopRepository.findById(id);
         if (shopOptional.isPresent()) {
-            Shop shop = shopOptional.get();
-            return transferToDto(shop);
+            return transferToDto(shopOptional.get());
         } else {
             throw new RecordNotFoundException("No shop found with id: " + id);
         }
     }
 
-    // Voeg een nieuwe shop toe en retourneer een ShopDto
-    public Shop addShop(Shop shop) {
+    public ShopDto addShop(ShopInputDto shopInputDto) {
+        Shop shop = transferToShop(shopInputDto);
+
         if (shop.getContactInfo() != null) {
-            // Sla de ContactInfo eerst op als deze niet null is
             ContactInfo savedContactInfo = contactInfoService.saveContactInfo(shop.getContactInfo());
             shop.setContactInfo(savedContactInfo);
         }
 
-        // Sla daarna de Shop op
-        return shopRepository.save(shop);
+        Shop savedShop = shopRepository.save(shop);
+        return transferToDto(savedShop);
     }
 
+    public ShopDto updateShop(Long id, ShopInputDto shopInputDto) {
+        Optional<Shop> shopOptional = shopRepository.findById(id);
+        if (shopOptional.isPresent()) {
+            Shop shopToUpdate = shopOptional.get();
+            shopToUpdate.setShopName(shopInputDto.getShopName());
 
-    // Verwijder een shop via ID
+            if (shopInputDto.getContactInfo() != null) {
+                ContactInfo contactInfo = contactInfoService.transferToEntity(shopInputDto.getContactInfo());
+                shopToUpdate.setContactInfo(contactInfo);
+            }
+
+            shopToUpdate.setLogo(shopInputDto.getLogo());
+            Shop updatedShop = shopRepository.save(shopToUpdate);
+            return transferToDto(updatedShop);
+        } else {
+            throw new RecordNotFoundException("No shop found with id: " + id);
+        }
+    }
+
+    public ShopDto updatePartialShop(Long id, ShopInputDto shopInputDto) {
+        Optional<Shop> shopOptional = shopRepository.findById(id);
+        if (shopOptional.isPresent()) {
+            Shop shopToUpdate = shopOptional.get();
+
+            if (shopInputDto.getShopName() != null) {
+                shopToUpdate.setShopName(shopInputDto.getShopName());
+            }
+            if (shopInputDto.getLogo() != null) {
+                shopToUpdate.setLogo(shopInputDto.getLogo());
+            }
+            if (shopInputDto.getContactInfo() != null) {
+                ContactInfo contactInfo = contactInfoService.transferToEntity(shopInputDto.getContactInfo());
+                shopToUpdate.setContactInfo(contactInfo);
+            }
+
+            Shop updatedShop = shopRepository.save(shopToUpdate);
+            return transferToDto(updatedShop);
+        } else {
+            throw new RecordNotFoundException("No shop found with id: " + id);
+        }
+    }
+
     public void deleteShop(@RequestBody Long id) {
         if (shopRepository.existsById(id)) {
             shopRepository.deleteById(id);
@@ -82,58 +114,26 @@ public class ShopService {
         }
     }
 
-    // Werk een shop volledig bij en retourneer een bijgewerkte ShopDto
-    public ShopDto updateShop(Long id, ShopInputDto newShop) {
-        Optional<Shop> shopOptional = shopRepository.findById(id);
-        if (shopOptional.isPresent()) {
-            Shop shopToUpdate = shopOptional.get();
-            shopToUpdate.setShopName(newShop.getShopName());
-
-            // Zet ContactInfoDto om naar ContactInfo
-            if (newShop.getContactInfo() != null) {
-                ContactInfo contactInfo = contactInfoService.transferToEntity(newShop.getContactInfo());
-                shopToUpdate.setContactInfo(contactInfo);
-            }
-
-            shopToUpdate.setLogo(newShop.getLogo());
-            Shop updatedShop = shopRepository.save(shopToUpdate);
-            return transferToDto(updatedShop);
-        } else {
-            throw new RecordNotFoundException("No shop found with id: " + id);
-        }
-    }
-
-
-    // Converteer een ShopInputDto naar een Shop
     public Shop transferToShop(ShopInputDto dto) {
         Shop shop = new Shop();
         shop.setShopName(dto.getShopName());
         shop.setLogo(dto.getLogo());
-
-        // Zet ContactInfoDto om naar ContactInfo
         if (dto.getContactInfo() != null) {
             ContactInfo contactInfo = contactInfoService.transferToEntity(dto.getContactInfo());
             shop.setContactInfo(contactInfo);
         }
-
         return shop;
     }
 
-
-    // Converteer een Shop naar een ShopDto
     public ShopDto transferToDto(Shop shop) {
         ShopDto dto = new ShopDto();
         dto.setShopId(shop.getShopId());
         dto.setShopName(shop.getShopName());
         dto.setLogo(shop.getLogo());
-
-        // Zet ContactInfo om naar ContactInfoDto
         if (shop.getContactInfo() != null) {
             ContactInfoDto contactInfoDto = contactInfoService.transferToDto(shop.getContactInfo());
             dto.setContactInfo(contactInfoDto);
         }
-
         return dto;
     }
-
 }
