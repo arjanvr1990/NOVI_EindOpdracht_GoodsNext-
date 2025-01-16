@@ -1,35 +1,13 @@
 package com.arjanvanraamsdonk.goodsnext.dto;
 
-import java.util.List;
+import java.util.Set;
 
 public class UserDto {
-
-    private Long userId;
     private String username;
-    private String password; // In productie zou je dit nooit retourneren!
-    private ContactInfoDto contactInfo;
-    private List<RoleDto> roles;
-
-    // Constructors
-    public UserDto() {
-    }
-
-    public UserDto(Long userId, String username, ContactInfoDto contactInfo, List<RoleDto> roles) {
-        this.userId = userId;
-        this.username = username;
-        this.contactInfo = contactInfo;
-        this.roles = roles;
-    }
+    private String password;
+    private Set<String> roles;
 
     // Getters and Setters
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
     public String getUsername() {
         return username;
     }
@@ -38,19 +16,19 @@ public class UserDto {
         this.username = username;
     }
 
-    public ContactInfoDto getContactInfo() {
-        return contactInfo;
+    public String getPassword() {
+        return password;
     }
 
-    public void setContactInfo(ContactInfoDto contactInfo) {
-        this.contactInfo = contactInfo;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public List<RoleDto> getRoles() {
+    public Set<String> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<RoleDto> roles) {
+    public void setRoles(Set<String> roles) {
         this.roles = roles;
     }
 }

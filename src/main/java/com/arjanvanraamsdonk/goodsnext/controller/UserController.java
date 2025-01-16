@@ -1,7 +1,6 @@
 package com.arjanvanraamsdonk.goodsnext.controller;
 
 import com.arjanvanraamsdonk.goodsnext.dto.UserDto;
-import com.arjanvanraamsdonk.goodsnext.dto.UserInputDto;
 import com.arjanvanraamsdonk.goodsnext.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,36 +17,29 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<UserDto>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
-    }
-
     @PostMapping
-    public ResponseEntity<UserDto> addUser(@RequestBody UserInputDto userInputDto) {
-        UserDto createdUser = userService.addUser(userInputDto);
+    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
+        UserDto createdUser = userService.createUser(userDto);
         return ResponseEntity.ok(createdUser);
     }
 
-//    public ResponseEntity<String> addUser() {
-//        return ResponseEntity.ok("POST endpoint is bereikbaar");
-//    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserInputDto userInputDto) {
-        UserDto updatedUser = userService.updateUser(id, userInputDto);
-        return ResponseEntity.ok(updatedUser);
+    @GetMapping("/{username}")
+    public ResponseEntity<UserDto> getUser(@PathVariable String username) {
+        UserDto user = userService.getUserByUsername(username);
+        return ResponseEntity.ok(user);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+    @GetMapping
+    public ResponseEntity<List<UserDto>> getAllUsers() {
+        List<UserDto> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
+    @PostMapping("/{username}/roles")
+    public ResponseEntity<String> addRoleToUser(
+            @PathVariable String username,
+            @RequestParam String roleName) {
+        userService.addRoleToUser(username, roleName);
+        return ResponseEntity.ok("Role added successfully");
     }
 }
-

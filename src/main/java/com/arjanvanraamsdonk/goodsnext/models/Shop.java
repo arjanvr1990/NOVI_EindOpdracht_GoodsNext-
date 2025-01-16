@@ -1,34 +1,33 @@
 package com.arjanvanraamsdonk.goodsnext.models;
 
-
 import jakarta.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
+@Table(name = "shops")
 public class Shop {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "shop_id")
     private Long shopId;
 
+    @Column(name = "shop_name", nullable = false)
     private String shopName;
 
-    private String logo;
+    @ManyToOne
+    @JoinColumn(name = "photo_upload_id", referencedColumnName = "upload_id")
+    private PhotoUpload logo;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "contact_info_id", referencedColumnName = "id")
     private ContactInfo contactInfo;
 
+    @ManyToMany(mappedBy = "shops")
+    private Set<User> users = new HashSet<>();
 
-    public Shop() {
-    }
-
-    public Shop(Long shopId, String shopName, String logo, ContactInfo contactInfo) {
-        this.shopId = shopId;
-        this.shopName = shopName;
-        this.logo = logo;
-        this.contactInfo = contactInfo;
-    }
-
+    // Getters en Setters
     public Long getShopId() {
         return shopId;
     }
@@ -45,11 +44,11 @@ public class Shop {
         this.shopName = shopName;
     }
 
-    public String getLogo() {
+    public PhotoUpload getLogo() {
         return logo;
     }
 
-    public void setLogo(String logo) {
+    public void setLogo(PhotoUpload logo) {
         this.logo = logo;
     }
 
@@ -59,5 +58,13 @@ public class Shop {
 
     public void setContactInfo(ContactInfo contactInfo) {
         this.contactInfo = contactInfo;
+    }
+
+    public Set<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<User> users) {
+        this.users = users;
     }
 }

@@ -1,24 +1,15 @@
 package com.arjanvanraamsdonk.goodsnext.dto;
 
-
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 public class ShopInputDto {
 
-    @NotBlank(message = "Shop name is required")
-    @Size(max = 255, message = "Shop name must be at most 255 characters")
+    @NotBlank(message = "Shop name is mandatory")
     private String shopName;
-
-    private String logo;
-
+    private Long logo; // ID van PhotoUpload
     private ContactInfoDto contactInfo;
 
-    // Default Constructor
-    public ShopInputDto() {
-    }
-
-    // Getters and Setters
+    // Getters en Setters
     public String getShopName() {
         return shopName;
     }
@@ -27,11 +18,11 @@ public class ShopInputDto {
         this.shopName = shopName;
     }
 
-    public String getLogo() {
+    public Long getLogo() {
         return logo;
     }
 
-    public void setLogo(String logo) {
+    public void setLogo(Long logo) {
         this.logo = logo;
     }
 
@@ -43,4 +34,3 @@ public class ShopInputDto {
         this.contactInfo = contactInfo;
     }
 }
-

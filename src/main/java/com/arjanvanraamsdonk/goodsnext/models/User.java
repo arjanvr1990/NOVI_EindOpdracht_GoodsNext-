@@ -1,54 +1,55 @@
 package com.arjanvanraamsdonk.goodsnext.models;
 
 import jakarta.persistence.*;
-import com.arjanvanraamsdonk.goodsnext.models.Role;
-
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@Table(name = "user_table") // Of een andere naam
+@Table(name = "users") // Zorg dat dit overeenkomt met je database-schema
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Automatische ID-generatie
+    @Column(name = "user_id")
+    private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
 
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "contact_info_id", referencedColumnName = "id")
     private ContactInfo contactInfo;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany
     @JoinTable(
-            name = "user_roles",
+            name = "user_shop",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "shop_id")
+    )
+    private Set<Shop> shops = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private List<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
-    // Constructors
     public User() {
+        // Lege constructor nodig voor JPA
     }
 
-    public User(String username, String password, ContactInfo contactInfo, List<Role> roles) {
-        this.username = username;
-        this.password = password;
-        this.contactInfo = contactInfo;
-        this.roles = roles;
+    // Getters en Setters
+    public Long getId() {
+        return id;
     }
 
-    // Getters and Setters
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getUsername() {
@@ -75,11 +76,37 @@ public class User {
         this.contactInfo = contactInfo;
     }
 
-    public List<Role> getRoles() {
+    public Set<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<Role> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public void addRole(Role role) {
+        this.roles.add(role);
+    }
+
+    public void removeRole(Role role) {
+        this.roles.remove(role);
+    }
+
+    public Set<Shop> getShops() {
+        return shops;
+    }
+
+    public void setShops(Set<Shop> shops) {
+        this.shops = shops;
+    }
+
+    public void addShop(Shop shop) {
+        this.shops.add(shop);
+        shop.getUsers().add(this); // Zorgt ervoor dat de associatie tweezijdig is
+    }
+
+    public void removeShop(Shop shop) {
+        this.shops.remove(shop);
+        shop.getUsers().remove(this); // Zorgt ervoor dat de associatie tweezijdig is
     }
 }
