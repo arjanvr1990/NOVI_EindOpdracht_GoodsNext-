@@ -1,9 +1,8 @@
 package com.arjanvanraamsdonk.goodsnext.dto;
 
-
 public class ProductDto {
 
-    private Long id;
+    private Long productId; // Correct veldnaam gebruikt
     private String productName;
     private String productDescription;
     private Double productPrice;
@@ -12,13 +11,13 @@ public class ProductDto {
 
     // Constructor
     public ProductDto(
-            Long id,
+            Long productId,
             String productName,
             String productDescription,
             Double productPrice,
             Boolean productAvailability,
             String productImg) {
-        this.id = id;
+        this.productId = productId;
         this.productName = productName;
         this.productDescription = productDescription;
         this.productPrice = productPrice;
@@ -31,12 +30,12 @@ public class ProductDto {
     }
 
     // Getters and Setters
-    public Long getId() {
-        return id;
+    public Long getProductId() {
+        return productId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 
     public String getProductName() {
@@ -79,4 +78,3 @@ public class ProductDto {
         this.productImg = productImg;
     }
 }
-

@@ -1,14 +1,12 @@
 package com.arjanvanraamsdonk.goodsnext.service;
 
-
-import com.arjanvanraamsdonk.goodsnext.models.Product;
-import com.arjanvanraamsdonk.goodsnext.repository.ProductRepository;
-
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
-import com.arjanvanraamsdonk.goodsnext.exception.RecordNotFoundException;
 import com.arjanvanraamsdonk.goodsnext.dto.ProductDto;
 import com.arjanvanraamsdonk.goodsnext.dto.ProductInputDto;
+import com.arjanvanraamsdonk.goodsnext.exception.RecordNotFoundException;
+import com.arjanvanraamsdonk.goodsnext.models.Product;
+import com.arjanvanraamsdonk.goodsnext.repository.ProductRepository;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -16,124 +14,105 @@ import java.util.Optional;
 @Service
 public class ProductService {
 
-    // We importeren de repository nu in de service in plaats van in de controller.
-    // dit mag met constructor injection of autowire.
     private final ProductRepository productRepository;
 
-    public ProductService(ProductRepository productRepository){
+    public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
 
-    // Vanuit de repository kunnen we een lijst van Products krijgen, maar de communicatie container tussen Service en
-    // Controller is de Dto. We moeten de Products dus vertalen naar ProductDtos. Dit moet een voor een, omdat
-    // de translateToDto() methode geen lijst accepteert als argument, dus gebruiken we een for-loop.
     public List<ProductDto> getAllProducts() {
-        List<Product> productList = productRepository.findAll();
-        List<ProductDto> productDtoList = new ArrayList<>();
-
-        for(Product product : productList) {
-            ProductDto dto = transferToDto(product);
-            productDtoList.add(dto);
+        List<Product> products = productRepository.findAll();
+        List<ProductDto> productDtos = new ArrayList<>();
+        for (Product product : products) {
+            productDtos.add(transferToDto(product));
         }
-        return productDtoList;
+        return productDtos;
     }
 
-    // Vanuit de repository kunnen we een lijst van Products met een bepaalde brand krijgen, maar de communicatie
-    // container tussen Service en Controller is de Dto. We moeten de Products dus vertalen naar ProductDtos. Dit
-    // moet een voor een, omdat de translateToDto() methode geen lijst accepteert als argument, dus gebruiken we een for-loop.
-    public List<ProductDto> getAllProductsByBrand(String brand) {
-        List<Product> productList = productRepository.findAllProductsByProductNameEqualsIgnoreCase(brand);
-        List<ProductDto> productDtoList = new ArrayList<>();
-
-        for(Product product : productList) {
-            ProductDto dto = transferToDto(product);
-            productDtoList.add(dto);
+    public List<ProductDto> getAllProductsByName(String productName) {
+        List<Product> products = productRepository.findAllProductsByProductNameEqualsIgnoreCase(productName);
+        List<ProductDto> productDtos = new ArrayList<>();
+        for (Product product : products) {
+            productDtos.add(transferToDto(product));
         }
-        return productDtoList;
+        return productDtos;
     }
 
-    // Deze methode is inhoudelijk hetzelfde als het was in de vorige opdracht. Wat verandert is, is dat we nu checken
-    // op optional.isPresent in plaats van optional.isEmpty en we returnen een ProductDto in plaats van een Product.
     public ProductDto getProductById(Long id) {
         Optional<Product> productOptional = productRepository.findById(id);
-        if (productOptional.isPresent()){
-            Product product = productOptional.get();
-            return transferToDto(product);
+        if (productOptional.isPresent()) {
+            return transferToDto(productOptional.get());
         } else {
-            throw new RecordNotFoundException("geen product gevonden");
+            throw new RecordNotFoundException("No product found with id: " + id);
         }
     }
 
-    // In deze methode moeten we twee keer een vertaal methode toepassen.
-    // De eerste keer van dto naar product, omdat de parameter een dto is.
-    // De tweede keer van product naar dto, omdat de return waarde een dto is.
-    public ProductDto addProduct(ProductInputDto dto) {
-
-        Product product = transferToProduct(dto);
-        productRepository.save(product);
-
-        return transferToDto(product);
+    public ProductDto addProduct(ProductInputDto productInputDto) {
+        Product product = transferToEntity(productInputDto);
+        Product savedProduct = productRepository.save(product);
+        return transferToDto(savedProduct);
     }
 
-    // Deze methode is inhoudelijk niet veranderd. Het is alleen verplaatst naar de Service laag.
-    public void deleteProduct(@RequestBody Long id) {
-
-        productRepository.deleteById(id);
-
-    }
-
-    // Deze methode is inhoudelijk niet veranderd, alleen staat het nu in de Service laag en worden er Dto's en
-    // vertaal methodes gebruikt.
-    public ProductDto updateProduct(Long id, ProductInputDto newProduct) {
-
+    public ProductDto updateProduct(Long id, ProductInputDto productInputDto) {
         Optional<Product> productOptional = productRepository.findById(id);
-        if (productOptional.isPresent()){
-
-            Product product1 = productOptional.get();
-
-
-            product1.setProductName(newProduct.getProductName());
-            product1.setProductDescription(newProduct.getProductDescription());
-            product1.setProductPrice(newProduct.getProductPrice());
-            product1.setProductAvailability(newProduct.getProductAvailability());
-            product1.setProductImg(newProduct.getProductImg());
-            Product returnProduct = productRepository.save(product1);
-
-            return transferToDto(returnProduct);
-
+        if (productOptional.isPresent()) {
+            Product productToUpdate = productOptional.get();
+            productToUpdate.setProductName(productInputDto.getProductName());
+            productToUpdate.setProductDescription(productInputDto.getProductDescription());
+            productToUpdate.setProductPrice(productInputDto.getProductPrice());
+            productToUpdate.setProductAvailability(productInputDto.getProductAvailability());
+            productToUpdate.setProductImg(productInputDto.getProductImg());
+            Product updatedProduct = productRepository.save(productToUpdate);
+            return transferToDto(updatedProduct);
         } else {
-
-            throw new  RecordNotFoundException("geen product gevonden");
-
+            throw new RecordNotFoundException("No product found with id: " + id);
         }
-
     }
 
-    // Dit is de vertaal methode van ProductInputDto naar Product.
-    public Product transferToProduct(ProductInputDto dto){
-        var product = new Product();
+    public ProductDto updatePartialProduct(Long id, ProductInputDto productInputDto) {
+        Optional<Product> productOptional = productRepository.findById(id);
+        if (productOptional.isPresent()) {
+            Product productToUpdate = productOptional.get();
+            if (productInputDto.getProductName() != null) {
+                productToUpdate.setProductName(productInputDto.getProductName());
+            }
+            if (productInputDto.getProductDescription() != null) {
+                productToUpdate.setProductDescription(productInputDto.getProductDescription());
+            }
+            if (productInputDto.getProductPrice() != null) {
+                productToUpdate.setProductPrice(productInputDto.getProductPrice());
+            }
+            if (productInputDto.getProductAvailability() != null) {
+                productToUpdate.setProductAvailability(productInputDto.getProductAvailability());
+            }
+            if (productInputDto.getProductImg() != null) {
+                productToUpdate.setProductImg(productInputDto.getProductImg());
+            }
+            Product updatedProduct = productRepository.save(productToUpdate);
+            return transferToDto(updatedProduct);
+        } else {
+            throw new RecordNotFoundException("No product found with id: " + id);
+        }
+    }
 
-        product.setProductName(dto.getProductName());
-        product.setProductDescription(dto.getProductDescription());
-        product.setProductPrice(dto.getProductPrice());
-        product.setProductAvailability(dto.getProductAvailability());
-        product.setProductImg(dto.getProductImg());
+    private ProductDto transferToDto(Product product) {
+        ProductDto productDto = new ProductDto();
+        productDto.setProductId(product.getId());
+        productDto.setProductName(product.getProductName());
+        productDto.setProductDescription(product.getProductDescription());
+        productDto.setProductPrice(product.getProductPrice());
+        productDto.setProductAvailability(product.getProductAvailability());
+        productDto.setProductImg(product.getProductImg());
+        return productDto;
+    }
 
+    private Product transferToEntity(ProductInputDto productInputDto) {
+        Product product = new Product();
+        product.setProductName(productInputDto.getProductName());
+        product.setProductDescription(productInputDto.getProductDescription());
+        product.setProductPrice(productInputDto.getProductPrice());
+        product.setProductAvailability(productInputDto.getProductAvailability());
+        product.setProductImg(productInputDto.getProductImg());
         return product;
     }
-
-    // Dit is de vertaal methode van Product naar ProductDto
-    public ProductDto transferToDto(Product product){
-        ProductDto dto = new ProductDto();
-
-        dto.setId(product.getId());
-        dto.setProductName(product.getProductName());
-        dto.setProductDescription(product.getProductDescription());
-        dto.setProductPrice(product.getProductPrice());
-        dto.setProductAvailability(product.getProductAvailability());
-        dto.setProductImg(product.getProductImg());
-
-
-        return dto;
-    }
-};
+}
