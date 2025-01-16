@@ -1,35 +1,24 @@
 package com.arjanvanraamsdonk.goodsnext.dto;
 
-package com.arjanvanraamsdonk.goodsnext.dto;
 
-public class ShopDto {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-    private Long shopId;
+public class ShopInputDto {
+
+    @NotBlank(message = "Shop name is required")
+    @Size(max = 255, message = "Shop name must be at most 255 characters")
     private String shopName;
+
     private String logo;
+
     private ContactInfoDto contactInfo;
 
-    // Constructor
-    public ShopDto(Long shopId, String shopName, String logo, ContactInfoDto contactInfo) {
-        this.shopId = shopId;
-        this.shopName = shopName;
-        this.logo = logo;
-        this.contactInfo = contactInfo;
-    }
-
     // Default Constructor
-    public ShopDto() {
+    public ShopInputDto() {
     }
 
     // Getters and Setters
-    public Long getShopId() {
-        return shopId;
-    }
-
-    public void setShopId(Long shopId) {
-        this.shopId = shopId;
-    }
-
     public String getShopName() {
         return shopName;
     }
@@ -54,3 +43,4 @@ public class ShopDto {
         this.contactInfo = contactInfo;
     }
 }
+
