@@ -1,15 +1,20 @@
 package com.arjanvanraamsdonk.goodsnext.controller;
 
+import com.arjanvanraamsdonk.goodsnext.dto.ProductInputDto;
 import com.arjanvanraamsdonk.goodsnext.exception.RecordNotFoundException;
 import com.arjanvanraamsdonk.goodsnext.models.Product;
 import com.arjanvanraamsdonk.goodsnext.repository.ProductRepository;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("api")
 public class ProductController {
 
     private final ProductRepository productRepository;
@@ -53,13 +58,32 @@ public class ProductController {
 
     }
 
+
+
     @PostMapping("/products")
-    public ResponseEntity<Product> addProduct(@RequestBody Product product) {
+    public ResponseEntity<Product> addProduct(@Valid @RequestBody ProductInputDto productInputDto) {
+        // Converteer de DTO naar een Product-entiteit
+        Product product = new Product();
+        product.setProductName(productInputDto.getProductName());
+        product.setProductDescription(productInputDto.getProductDescription());
+        product.setProductPrice(productInputDto.getProductPrice());
+        product.setProductAvailability(productInputDto.getProductAvailability());
+        product.setProductImg(productInputDto.getProductImg());
 
-        Product returnProduct = productRepository.save(product);
+        // Sla het product op in de database
+        Product savedProduct = productRepository.save(product);
 
-        return ResponseEntity.created(null).body(returnProduct);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(savedProduct.getId())
+                .toUri();
+
+        // Retourneer een 201 Created response met de locatie en het opgeslagen product
+        return ResponseEntity.created(location).body(savedProduct);
     }
+
 
     @PutMapping("/products/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product newProduct) {
