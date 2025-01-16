@@ -3,12 +3,17 @@ package com.arjanvanraamsdonk.goodsnext.controller;
 
 import com.arjanvanraamsdonk.goodsnext.dto.ShopInputDto;
 import com.arjanvanraamsdonk.goodsnext.exception.RecordNotFoundException;
+import com.arjanvanraamsdonk.goodsnext.models.ContactInfo;
 import com.arjanvanraamsdonk.goodsnext.models.Shop;
 import com.arjanvanraamsdonk.goodsnext.repository.ShopRepository;
+import com.arjanvanraamsdonk.goodsnext.service.ContactInfoService;
+import com.arjanvanraamsdonk.goodsnext.service.ShopService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+
 
 import java.net.URI;
 import java.util.List;
@@ -19,10 +24,16 @@ import java.util.Optional;
 public class ShopController {
 
     private final ShopRepository shopRepository;
+    private final ShopService shopService;
+    private final ContactInfoService contactInfoService;
 
-    public ShopController(ShopRepository shopRepository) {
+    public ShopController(ShopRepository shopRepository, ShopService shopService, ContactInfoService contactInfoService) {
         this.shopRepository = shopRepository;
+        this.shopService = shopService;
+        this.contactInfoService = contactInfoService;
     }
+
+
 
     @GetMapping("/shops")
     public ResponseEntity<List<Shop>> getAllShops(@RequestParam(value = "shopName", required = false) String shopName) {
@@ -54,8 +65,11 @@ public class ShopController {
         // Converteer de DTO naar een Shop-entiteit
         Shop shop = new Shop();
         shop.setShopName(shopInputDto.getShopName());
-        shop.setContactInfo(shopInputDto.getContactInfo());
         shop.setLogo(shopInputDto.getLogo());
+
+        // Gebruik ContactInfoService om ContactInfoDto om te zetten naar ContactInfo
+        ContactInfo contactInfo = contactInfoService.transferToEntity(shopInputDto.getContactInfo());
+        shop.setContactInfo(contactInfo);
 
         // Sla de shop op in de database
         Shop savedShop = shopRepository.save(shop);
@@ -66,9 +80,9 @@ public class ShopController {
                 .buildAndExpand(savedShop.getShopId())
                 .toUri();
 
-        // Retourneer een 201 Created response met de locatie en de opgeslagen shop
         return ResponseEntity.created(location).body(savedShop);
     }
+
 
     @PutMapping("/shops/{id}")
     public ResponseEntity<Shop> updateShop(@PathVariable Long id, @RequestBody Shop newShop) {

@@ -1,8 +1,10 @@
 package com.arjanvanraamsdonk.goodsnext.service;
 
+import com.arjanvanraamsdonk.goodsnext.dto.ContactInfoDto;
 import com.arjanvanraamsdonk.goodsnext.dto.ShopDto;
 import com.arjanvanraamsdonk.goodsnext.dto.ShopInputDto;
 import com.arjanvanraamsdonk.goodsnext.exception.RecordNotFoundException;
+import com.arjanvanraamsdonk.goodsnext.models.ContactInfo;
 import com.arjanvanraamsdonk.goodsnext.models.Shop;
 import com.arjanvanraamsdonk.goodsnext.repository.ShopRepository;
 import org.springframework.stereotype.Service;
@@ -16,9 +18,11 @@ import java.util.Optional;
 public class ShopService {
 
     private final ShopRepository shopRepository;
+    private final ContactInfoService contactInfoService;
 
-    public ShopService(ShopRepository shopRepository) {
+    public ShopService(ShopRepository shopRepository, ContactInfoService contactInfoService) {
         this.shopRepository = shopRepository;
+        this.contactInfoService = contactInfoService;
     }
 
     // Haal alle shops op en vertaal naar ShopDto's
@@ -57,11 +61,17 @@ public class ShopService {
     }
 
     // Voeg een nieuwe shop toe en retourneer een ShopDto
-    public ShopDto addShop(ShopInputDto dto) {
-        Shop shop = transferToShop(dto);
-        shopRepository.save(shop);
-        return transferToDto(shop);
+    public Shop addShop(Shop shop) {
+        if (shop.getContactInfo() != null) {
+            // Sla de ContactInfo eerst op als deze niet null is
+            ContactInfo savedContactInfo = contactInfoService.saveContactInfo(shop.getContactInfo());
+            shop.setContactInfo(savedContactInfo);
+        }
+
+        // Sla daarna de Shop op
+        return shopRepository.save(shop);
     }
+
 
     // Verwijder een shop via ID
     public void deleteShop(@RequestBody Long id) {
@@ -78,7 +88,13 @@ public class ShopService {
         if (shopOptional.isPresent()) {
             Shop shopToUpdate = shopOptional.get();
             shopToUpdate.setShopName(newShop.getShopName());
-            shopToUpdate.setContactInfo(newShop.getContactInfo());
+
+            // Zet ContactInfoDto om naar ContactInfo
+            if (newShop.getContactInfo() != null) {
+                ContactInfo contactInfo = contactInfoService.transferToEntity(newShop.getContactInfo());
+                shopToUpdate.setContactInfo(contactInfo);
+            }
+
             shopToUpdate.setLogo(newShop.getLogo());
             Shop updatedShop = shopRepository.save(shopToUpdate);
             return transferToDto(updatedShop);
@@ -87,14 +103,22 @@ public class ShopService {
         }
     }
 
+
     // Converteer een ShopInputDto naar een Shop
     public Shop transferToShop(ShopInputDto dto) {
         Shop shop = new Shop();
         shop.setShopName(dto.getShopName());
         shop.setLogo(dto.getLogo());
-        shop.setContactInfo(dto.getContactInfo());
+
+        // Zet ContactInfoDto om naar ContactInfo
+        if (dto.getContactInfo() != null) {
+            ContactInfo contactInfo = contactInfoService.transferToEntity(dto.getContactInfo());
+            shop.setContactInfo(contactInfo);
+        }
+
         return shop;
     }
+
 
     // Converteer een Shop naar een ShopDto
     public ShopDto transferToDto(Shop shop) {
@@ -102,7 +126,14 @@ public class ShopService {
         dto.setShopId(shop.getShopId());
         dto.setShopName(shop.getShopName());
         dto.setLogo(shop.getLogo());
-        dto.setContactInfo(shop.getContactInfo());
+
+        // Zet ContactInfo om naar ContactInfoDto
+        if (shop.getContactInfo() != null) {
+            ContactInfoDto contactInfoDto = contactInfoService.transferToDto(shop.getContactInfo());
+            dto.setContactInfo(contactInfoDto);
+        }
+
         return dto;
     }
+
 }

@@ -14,9 +14,10 @@ public class Shop {
 
     private String logo;
 
-    @OneToOne
-    @JoinColumn(name = "contact_info_id")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "contact_info_id", referencedColumnName = "id")
     private ContactInfo contactInfo;
+
 
     public Shop() {
     }

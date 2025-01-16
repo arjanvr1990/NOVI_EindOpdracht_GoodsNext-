@@ -1,6 +1,6 @@
 package com.arjanvanraamsdonk.goodsnext.dto;
 
-package com.arjanvanraamsdonk.goodsnext.dto;
+
 
 public class ShopDto {
 
