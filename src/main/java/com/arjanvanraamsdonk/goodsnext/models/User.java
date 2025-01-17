@@ -5,11 +5,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "users") // Zorg dat dit overeenkomt met je database-schema
+@Table(name = "users")
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Automatische ID-generatie
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
 
@@ -31,19 +31,14 @@ public class User {
     )
     private Set<Shop> shops = new HashSet<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_role",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles = new HashSet<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Authority> authorities = new HashSet<>();
 
+    // Default constructor
     public User() {
-        // Lege constructor nodig voor JPA
     }
 
-    // Getters en Setters
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -76,22 +71,6 @@ public class User {
         this.contactInfo = contactInfo;
     }
 
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
-    }
-
-    public void addRole(Role role) {
-        this.roles.add(role);
-    }
-
-    public void removeRole(Role role) {
-        this.roles.remove(role);
-    }
-
     public Set<Shop> getShops() {
         return shops;
     }
@@ -102,11 +81,29 @@ public class User {
 
     public void addShop(Shop shop) {
         this.shops.add(shop);
-        shop.getUsers().add(this); // Zorgt ervoor dat de associatie tweezijdig is
+        shop.getUsers().add(this);
     }
 
     public void removeShop(Shop shop) {
         this.shops.remove(shop);
-        shop.getUsers().remove(this); // Zorgt ervoor dat de associatie tweezijdig is
+        shop.getUsers().remove(this);
+    }
+
+    public Set<Authority> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(Set<Authority> authorities) {
+        this.authorities = authorities;
+    }
+
+    public void addAuthority(Authority authority) {
+        this.authorities.add(authority);
+        authority.setUser(this);
+    }
+
+    public void removeAuthority(Authority authority) {
+        this.authorities.remove(authority);
+        authority.setUser(null);
     }
 }
