@@ -31,8 +31,9 @@ public class User {
     )
     private Set<Shop> shops = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Authority> authorities = new HashSet<>();
+
 
     // Default constructor
     public User() {

@@ -79,14 +79,15 @@ public class SpringSecurityConfig {
     protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(csrf -> csrf.disable()) // Disable CSRF (alleen nodig als je geen browser-based clients hebt)
-                .httpBasic(basic -> basic.disable()) // Disable basic authentication
-                .cors(Customizer.withDefaults()) // Configureer CORS
-                .authorizeHttpRequests(auth -> auth
+                        .csrf(csrf -> csrf.disable()) // Disable CSRF (alleen nodig als je geen browser-based clients hebt)
+                        .httpBasic(basic -> basic.disable()) // Disable basic authentication
+                        .cors(Customizer.withDefaults()) // Configureer CORS
+                        .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/api/authentication/authenticate").permitAll() // Toegang tot authenticate endpoint zonder token
                                 .requestMatchers("/api/authentication/authenticated").authenticated() // Alleen geauthenticeerde gebruikers
                                 .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN") // Admin-only acties
                                 .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
                                 .requestMatchers("/api/shops/**").hasAnyRole("ADMIN", "USER") // Zowel Admin als User hebben toegang
                                 .anyRequest().denyAll() // Andere verzoeken worden geblokkeerd

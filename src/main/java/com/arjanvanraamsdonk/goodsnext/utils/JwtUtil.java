@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class JwtUtil {
@@ -49,7 +50,11 @@ public class JwtUtil {
     }
 
     public String generateToken(UserDetails userDetails) {
+        // Voeg rollen/authorities toe aan claims
         Map<String, Object> claims = new HashMap<>();
+        claims.put("roles", userDetails.getAuthorities().stream()
+                .map(authority -> authority.getAuthority()) // Verkrijg de naam van elke rol
+                .collect(Collectors.toList())); // Converteer naar een lijst van strings
         return createToken(claims, userDetails.getUsername());
     }
 
