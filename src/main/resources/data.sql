@@ -8,3 +8,6 @@ INSERT INTO authorities (user_id, authority) VALUES
                                                  (1, 'ROLE_ADMIN'),
                                                  (1, 'ROLE_USER'),
                                                  (2, 'ROLE_USER');
+
+
+

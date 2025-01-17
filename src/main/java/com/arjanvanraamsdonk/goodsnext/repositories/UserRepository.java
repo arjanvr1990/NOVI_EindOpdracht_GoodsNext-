@@ -2,6 +2,8 @@ package com.arjanvanraamsdonk.goodsnext.repositories;
 
 import com.arjanvanraamsdonk.goodsnext.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -9,9 +11,12 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    // Vind een gebruiker op basis van de gebruikersnaam
+    // Simpele methode om gebruiker te zoeken op basis van username
     Optional<User> findByUsername(String username);
 
-    // Controleer of een gebruiker bestaat op basis van de gebruikersnaam
-    boolean existsByUsername(String username);
+    // Methode met JOIN FETCH om authorities direct te laden
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.authorities WHERE u.username = :username")
+    Optional<User> findByUsernameWithAuthorities(@Param("username") String username);
 }
+
+

@@ -1,45 +1,44 @@
 package com.arjanvanraamsdonk.goodsnext.services;
 
 import com.arjanvanraamsdonk.goodsnext.dtos.UserDto;
+import com.arjanvanraamsdonk.goodsnext.repositories.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserService userService;
+    private final UserRepository userRepository;
 
-    public CustomUserDetailsService(UserService userService) {
-        this.userService = userService;
+    public CustomUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) {
-        // Haal de UserDto op via de UserService
-        UserDto userDto = userService.getUserByUsername(username);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        com.arjanvanraamsdonk.goodsnext.models.User user = userRepository.findByUsernameWithAuthorities(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        if (userDto == null) {
-            throw new RuntimeException("User not found: " + username);
-        }
+        List<GrantedAuthority> authorities = user.getAuthorities().stream()
+                .map(auth -> new SimpleGrantedAuthority(auth.getAuthority()))
+                .collect(Collectors.toList());
 
-        // Wachtwoord van de gebruiker
-        String password = userDto.getPassword();
-
-        // Authorities ophalen en omzetten naar GrantedAuthority
-        Set<String> authorities = userDto.getAuthorities();
-        List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-        for (String authority : authorities) {
-            grantedAuthorities.add(new SimpleGrantedAuthority(authority)); // Gebruik de authority zoals die is
-        }
-
-        // Maak en retourneer een Spring Security UserDetails object
-        return new org.springframework.security.core.userdetails.User(username, password, grantedAuthorities);
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
+                authorities
+        );
     }
 }
+
+
