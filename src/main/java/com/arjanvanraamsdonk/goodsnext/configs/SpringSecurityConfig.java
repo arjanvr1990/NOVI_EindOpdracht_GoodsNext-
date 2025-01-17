@@ -7,7 +7,7 @@
 //import org.springframework.security.web.SecurityFilterChain;
 //
 //@Configuration
-//public class SecurityConfig {
+//public class SpringSecurityConfig {
 //
 //    @Bean
 //    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -41,6 +41,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -69,7 +74,7 @@ public class SpringSecurityConfig {
         return new ProviderManager(auth);
     }
 
-    // SecurityFilterChain Bean
+
     @Bean
     protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -78,13 +83,13 @@ public class SpringSecurityConfig {
                 .httpBasic(basic -> basic.disable()) // Disable basic authentication
                 .cors(Customizer.withDefaults()) // Configureer CORS
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/authentication/authenticate").permitAll() // Toegang tot authenticate endpoint zonder token
-                        .requestMatchers("/api/authentication/authenticated").authenticated() // Alleen geauthenticeerde gebruikers
-                        .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN") // Admin-only acties
-                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
-                        .requestMatchers("/api/shops/**").hasAnyRole("ADMIN", "USER") // Zowel Admin als User hebben toegang
-                        .anyRequest().denyAll() // Andere verzoeken worden geblokkeerd
+                                .requestMatchers("/api/authentication/authenticate").permitAll() // Toegang tot authenticate endpoint zonder token
+                                .requestMatchers("/api/authentication/authenticated").authenticated() // Alleen geauthenticeerde gebruikers
+                                .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN") // Admin-only acties
+                                .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
+                                .requestMatchers("/api/shops/**").hasAnyRole("ADMIN", "USER") // Zowel Admin als User hebben toegang
+                                .anyRequest().denyAll() // Andere verzoeken worden geblokkeerd
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // Geen sessies, alleen stateless JWT
 
@@ -94,3 +99,4 @@ public class SpringSecurityConfig {
         return http.build();
     }
 }
+

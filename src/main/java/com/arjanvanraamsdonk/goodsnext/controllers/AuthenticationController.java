@@ -6,6 +6,8 @@ import com.arjanvanraamsdonk.goodsnext.dtos.AuthenticationRequest;
 import com.arjanvanraamsdonk.goodsnext.dtos.AuthenticationResponse;
 import com.arjanvanraamsdonk.goodsnext.services.CustomUserDetailsService;
 import com.arjanvanraamsdonk.goodsnext.utils.JwtUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -18,8 +20,10 @@ import java.security.Principal;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/authentication")
+@RequestMapping("api/authentication")
 public class AuthenticationController {
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
+
 
     private final AuthenticationManager authenticationManager;
     private final CustomUserDetailsService userDetailsService;
@@ -31,19 +35,20 @@ public class AuthenticationController {
         this.jwtUtil = jwtUtil;
     }
 
-    /**
-     * Deze methode retourneert de huidige geauthenticeerde gebruiker.
-     */
+
     @GetMapping("/authenticated")
     public ResponseEntity<Object> authenticated(Authentication authentication, Principal principal) {
         return ResponseEntity.ok().body(principal);
     }
 
-    /**
-     * Deze methode genereert een JWT-token als de gebruiker de juiste inloggegevens verstrekt.
-     */
+
     @PostMapping("/authenticate")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
+        logger.info("Authenticating user: {}", authenticationRequest.getUsername());
+        logger.info("Endpoint '/authenticate' hit");
+
+
+
         String username = authenticationRequest.getUsername();
         String password = authenticationRequest.getPassword();
 
@@ -60,5 +65,10 @@ public class AuthenticationController {
 
         return ResponseEntity.ok(new AuthenticationResponse(jwt));
     }
+
+
+
+
+
 }
 
