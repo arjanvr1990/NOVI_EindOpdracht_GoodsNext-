@@ -32,6 +32,7 @@ public class UserController {
         return userService.getUserById(id);
     }
 
+
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {

@@ -42,7 +42,7 @@ public class UserService {
         User user = new User();
         user.setUsername(userDto.getUsername());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setRoles(userDto.getRoles()); // Rollen instellen
+        user.setRoles(userDto.getRoles());
         userRepository.save(user);
         return new UserDto(user.getId(), user.getUsername(), null, user.getRoles());
     }
