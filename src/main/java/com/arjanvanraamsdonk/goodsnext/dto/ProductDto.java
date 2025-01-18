@@ -1,37 +1,24 @@
-package com.arjanvanraamsdonk.goodsnext.models;
+package com.arjanvanraamsdonk.goodsnext.dto;
 
-import jakarta.persistence.*;
 
-@Entity
-public class Product {
+public class ProductDto {
 
-    @Id
-
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String productName;
-
-    @Column(length = 1000)
     private String productDescription;
-
     private Double productPrice;
-
     private Boolean productAvailability;
-
     private String productImg;
 
-    public Product() {
-    }
-
-    public Product(
-            Long productId,
+    // Constructor
+    public ProductDto(
+            Long id,
             String productName,
             String productDescription,
             Double productPrice,
             Boolean productAvailability,
             String productImg) {
-        this.id = productId;
+        this.id = id;
         this.productName = productName;
         this.productDescription = productDescription;
         this.productPrice = productPrice;
@@ -39,11 +26,17 @@ public class Product {
         this.productImg = productImg;
     }
 
+    // Default Constructor
+    public ProductDto() {
+    }
 
-    public Long getId() {return id;}
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
 
-    public void setId(Long productId) {
-        this.id = productId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getProductName() {
@@ -85,5 +78,5 @@ public class Product {
     public void setProductImg(String productImg) {
         this.productImg = productImg;
     }
-
 }
+
