@@ -6,20 +6,7 @@ import jakarta.validation.constraints.*;
 
 public class ProductInputDto {
 
-//    @NotNull(message = "Product name is required")
-//    private String productName;
-//
-//    @Size(max = 1000, message = "Description must be between 0-1000 characters")
-//    private String productDescription;
-//
-//    @Positive(message = "Price must be higher than zero")
-//    private Double productPrice;
-//
-//    @NotNull(message = "Availability must be specified")
-//    private Boolean productAvailability;
-//
-//    private String productImg;
-
+    private Long shopId;
     @NotNull(message = "Product name is required")
     @Size(max = 255, message = "Product name must be at most 255 characters")
     @NotBlank(message = "Product name must not be blank")
@@ -76,5 +63,13 @@ public class ProductInputDto {
 
     public void setProductImg(String productImg) {
         this.productImg = productImg;
+    }
+
+    public Long getShopId() {
+        return shopId;
+    }
+
+    public void setShopId(Long shopId) {
+        this.shopId = shopId;
     }
 }

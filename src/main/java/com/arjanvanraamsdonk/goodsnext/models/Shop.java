@@ -10,7 +10,7 @@ public class Shop {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "shop_id")
+    @Column(name = "shop_id") // Zorgt ervoor dat de databasekolom correct wordt gebruikt
     private Long shopId;
 
     @Column(name = "shop_name", nullable = false)
@@ -24,9 +24,12 @@ public class Shop {
     @JoinColumn(name = "contact_info_id", referencedColumnName = "id")
     private ContactInfo contactInfo;
 
-    // `mappedBy` verwijst naar het veld `shops` in de `User`-entiteit
     @ManyToMany(mappedBy = "shops")
     private Set<User> users = new HashSet<>();
+
+    // Een bidirectionele relatie naar Product toevoegen
+    @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Product> products = new HashSet<>();
 
     // Getters en Setters
     public Long getShopId() {
@@ -67,5 +70,13 @@ public class Shop {
 
     public void setUsers(Set<User> users) {
         this.users = users;
+    }
+
+    public Set<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(Set<Product> products) {
+        this.products = products;
     }
 }

@@ -10,6 +10,10 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "shop_id", nullable = false)
+    private Shop shop;
+
     private String productName;
 
     @Column(length = 1000)
@@ -85,5 +89,9 @@ public class Product {
     public void setProductImg(String productImg) {
         this.productImg = productImg;
     }
+
+    public Shop getShop()  { return shop; }
+
+    public void setShop(Shop shop)  { this.shop = shop; }
 
 }
