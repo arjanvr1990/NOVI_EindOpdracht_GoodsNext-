@@ -1,20 +1,11 @@
 package com.arjanvanraamsdonk.goodsnext.dto;
 
-public class PhotoUploadDto {
-    private Long id;
+public class PhotoUploadInputDto {
     private String fileName;
     private String fileType;
     private Long fileSize;
 
     // Getters and setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getFileName() {
         return fileName;
     }
