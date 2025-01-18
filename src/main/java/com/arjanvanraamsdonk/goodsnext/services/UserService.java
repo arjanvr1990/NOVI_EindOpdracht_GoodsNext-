@@ -38,6 +38,8 @@ public class UserService {
         return new UserDto(user.getId(), user.getUsername(), null, user.getRoles());
     }
 
+
+
     public UserDto createUser(UserDto userDto) {
         User user = new User();
         user.setUsername(userDto.getUsername());

@@ -37,13 +37,14 @@ public class SpringSecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Nieuwe manier om CSRF uit te schakelen
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/authentication/authenticate").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/authentication/authenticate").permitAll() // Open endpoint voor authenticatie
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll() // Open endpoint voor gebruikersregistratie
+                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN") // Alleen toegankelijk voor ADMIN
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("ADMIN") // Alleen toegankelijk voor ADMIN
+                        .requestMatchers(HttpMethod.PUT, "/api/users/**").hasAnyRole("ADMIN")
+                        .anyRequest().authenticated() // Alle andere endpoints vereisen authenticatie
                 )
+
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Stateless sessies instellen
                 )
