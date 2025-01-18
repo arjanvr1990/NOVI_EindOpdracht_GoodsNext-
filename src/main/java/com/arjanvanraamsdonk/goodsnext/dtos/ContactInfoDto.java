@@ -3,6 +3,7 @@ package com.arjanvanraamsdonk.goodsnext.dtos;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+
 public class ContactInfoDto {
 
     @Email(message = "Email should be valid")

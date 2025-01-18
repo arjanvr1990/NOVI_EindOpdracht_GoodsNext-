@@ -43,13 +43,18 @@ public class SpringSecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("ADMIN") // Alleen toegankelijk voor ADMIN
                         .requestMatchers(HttpMethod.PUT, "/api/users/**").hasAnyRole("ADMIN")
 
+
+
                         .requestMatchers(HttpMethod.GET, "/api/contactinfo").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/contactinfo/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/contactinfo/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/contactinfo/me").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, "/api/contactinfo/me").hasRole("USER")
 
-
+                        .requestMatchers(HttpMethod.GET, "/api/shops/**").hasAnyRole("USER", "ADMIN") // USER en ADMIN kunnen shops bekijken
+                        .requestMatchers(HttpMethod.POST, "/api/shops").hasRole("ADMIN") // Alleen ADMIN kan shops aanmaken
+                        .requestMatchers(HttpMethod.PUT, "/api/shops/**").hasRole("ADMIN") // Alleen ADMIN kan shops bijwerken
+                        .requestMatchers(HttpMethod.PATCH, "/api/shops/**").hasRole("ADMIN") // Alleen ADMIN kan gedeeltelijke updates uitvoeren
 
 
 
