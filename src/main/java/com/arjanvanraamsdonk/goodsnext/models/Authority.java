@@ -40,4 +40,6 @@ public class Authority implements Serializable {
     public void setAuthority(String authority) {
         this.authority = authority;
     }
+
+
 }
