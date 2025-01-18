@@ -10,8 +10,8 @@ import java.io.Serializable;
 public class Authority implements Serializable {
 
     @Id
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false) // Verwijzing naar de primaire sleutel van de `users`-tabel
     private User user;
 
     @Id

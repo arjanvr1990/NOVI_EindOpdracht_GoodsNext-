@@ -19,13 +19,10 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-
-
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "contact_info_id", referencedColumnName = "id")
     private ContactInfo contactInfo;
 
-    // Definieer een ManyToMany-relatie met Shop
     @ManyToMany
     @JoinTable(
             name = "user_shop",
@@ -34,10 +31,10 @@ public class User {
     )
     private Set<Shop> shops = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<Authority> authorities = new HashSet<>();
 
-    // Getters en Setters
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -94,5 +91,22 @@ public class User {
     public void removeAuthority(Authority authority) {
         this.authorities.remove(authority);
         authority.setUser(null);
+    }
+
+    public Set<String> getRoles() {
+        Set<String> roles = new HashSet<>();
+        for (Authority authority : authorities) {
+            roles.add(authority.getAuthority());
+        }
+        return roles;
+    }
+
+
+    public void setRoles(Set<String> roles) {
+        this.authorities.clear();
+        for (String role : roles) {
+            Authority authority = new Authority(this, role);
+            this.authorities.add(authority);
+        }
     }
 }

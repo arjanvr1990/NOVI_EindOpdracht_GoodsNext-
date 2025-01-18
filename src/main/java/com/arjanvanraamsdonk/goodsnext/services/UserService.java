@@ -1,9 +1,11 @@
 package com.arjanvanraamsdonk.goodsnext.services;
 
 import com.arjanvanraamsdonk.goodsnext.dtos.UserDto;
+import com.arjanvanraamsdonk.goodsnext.exceptions.RecordNotFoundException;
 import com.arjanvanraamsdonk.goodsnext.models.Authority;
 import com.arjanvanraamsdonk.goodsnext.models.User;
 import com.arjanvanraamsdonk.goodsnext.repositories.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -15,80 +17,53 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    // Maak een nieuwe gebruiker aan
+
+
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(user -> new UserDto(user.getId(), user.getUsername(), user.getRoles()))
+                .collect(Collectors.toList());
+    }
+
+    public UserDto getUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("User not found"));
+        return new UserDto(user.getId(), user.getUsername(), null, user.getRoles());
+    }
+
+
+
     public UserDto createUser(UserDto userDto) {
         User user = new User();
         user.setUsername(userDto.getUsername());
-        user.setPassword(userDto.getPassword());
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        user.setRoles(userDto.getRoles());
+        userRepository.save(user);
+        return new UserDto(user.getId(), user.getUsername(), null, user.getRoles());
+    }
 
-        // Zet authorities (rollen) om naar een set van Authority-objecten
-        Set<Authority> authorities = new HashSet<>();
-        for (String authorityName : userDto.getAuthorities()) {
-            Authority authority = new Authority(user, authorityName);
-            authorities.add(authority);
+    public UserDto updateUser(Long id, UserDto userDto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("User not found"));
+
+        user.setUsername(userDto.getUsername());
+        if (userDto.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         }
-        user.setAuthorities(authorities);
-
-        // Sla de gebruiker op in de database
-        User savedUser = userRepository.save(user);
-        return convertToDto(savedUser);
-    }
-
-    // Haal een gebruiker op via de gebruikersnaam
-    public UserDto getUserByUsername(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
-        return convertToDto(user);
-    }
-
-    // Haal alle gebruikers op
-    public List<UserDto> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        return users.stream().map(this::convertToDto).collect(Collectors.toList());
-    }
-
-    // Voeg een nieuwe authority toe aan een gebruiker
-    public void addAuthorityToUser(String username, String authorityName) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
-
-        Authority authority = new Authority(user, authorityName);
-        user.addAuthority(authority);
-
-        // Sla de wijzigingen op
+        user.setRoles(userDto.getRoles()); // Rollen bijwerken
         userRepository.save(user);
+        return new UserDto(user.getId(), user.getUsername(), null, user.getRoles());
     }
 
-    // Verwijder een authority van een gebruiker
-    public void removeAuthorityFromUser(String username, String authorityName) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
-        Authority authority = user.getAuthorities().stream()
-                .filter(a -> a.getAuthority().equals(authorityName))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Authority not found: " + authorityName));
-
-        user.removeAuthority(authority);
-
-        // Sla de wijzigingen op
-        userRepository.save(user);
-    }
-
-    // Helper method: Zet een User om naar een UserDto
-    private UserDto convertToDto(User user) {
-        UserDto dto = new UserDto();
-        dto.setUsername(user.getUsername());
-        dto.setPassword(user.getPassword());
-        // Authorities worden direct omgezet naar een Set<String>
-        dto.setAuthorities(user.getAuthorities().stream()
-                .map(Authority::getAuthority)
-                .collect(Collectors.toSet()));
-        return dto;
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
     }
 }

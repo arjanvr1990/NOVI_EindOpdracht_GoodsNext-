@@ -3,11 +3,38 @@ package com.arjanvanraamsdonk.goodsnext.dtos;
 import java.util.Set;
 
 public class UserDto {
+    private Long id;
     private String username;
     private String password;
-    private Set<String> authorities; // Vervang "roles" door "authorities"
+    private Set<String> roles;
 
-    // Getters and Setters
+    // Lege constructor
+    public UserDto() {}
+
+    // Constructor zonder wachtwoord
+    public UserDto(Long id, String username, Set<String> roles) {
+        this.id = id;
+        this.username = username;
+        this.roles = roles;
+    }
+
+    // Bestaande constructor met wachtwoord
+    public UserDto(Long id, String username, String password, Set<String> roles) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.roles = roles;
+    }
+
+    // Getters en Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -24,11 +51,11 @@ public class UserDto {
         this.password = password;
     }
 
-    public Set<String> getAuthorities() {
-        return authorities; // Verander "roles" naar "authorities"
+    public Set<String> getRoles() {
+        return roles;
     }
 
-    public void setAuthorities(Set<String> authorities) {
-        this.authorities = authorities; // Verander "roles" naar "authorities"
+    public void setRoles(Set<String> roles) {
+        this.roles = roles;
     }
 }

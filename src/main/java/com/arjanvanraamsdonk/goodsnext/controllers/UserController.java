@@ -2,7 +2,10 @@ package com.arjanvanraamsdonk.goodsnext.controllers;
 
 import com.arjanvanraamsdonk.goodsnext.dtos.UserDto;
 import com.arjanvanraamsdonk.goodsnext.services.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,37 +20,44 @@ public class UserController {
         this.userService = userService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
+    public List<UserDto> getAllUsers() {
+        return userService.getAllUsers();
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
+        // Log de principal om te controleren wat beschikbaar is
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        System.out.println("Principal: " + principal);
+
+        return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+
+
+
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
+        System.out.println("POST /api/users aangeroepen door: " + SecurityContextHolder.getContext().getAuthentication().getName());
         UserDto createdUser = userService.createUser(userDto);
-        return ResponseEntity.ok(createdUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
-    @GetMapping("/{username}")
-    public ResponseEntity<UserDto> getUser(@PathVariable String username) {
-        UserDto user = userService.getUserByUsername(username);
-        return ResponseEntity.ok(user);
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
+        return ResponseEntity.ok(userService.updateUser(id, userDto));
     }
 
-    @GetMapping
-    public ResponseEntity<List<UserDto>> getAllUsers() {
-        List<UserDto> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
-    }
-
-    @PostMapping("/{username}/authorities")
-    public ResponseEntity<String> addAuthorityToUser(
-            @PathVariable String username,
-            @RequestParam String authorityName) {
-        userService.addAuthorityToUser(username, authorityName);
-        return ResponseEntity.ok("Authority added successfully");
-    }
-
-    @DeleteMapping("/{username}/authorities")
-    public ResponseEntity<String> removeAuthorityFromUser(
-            @PathVariable String username,
-            @RequestParam String authorityName) {
-        userService.removeAuthorityFromUser(username, authorityName);
-        return ResponseEntity.ok("Authority removed successfully");
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
     }
 }
+
