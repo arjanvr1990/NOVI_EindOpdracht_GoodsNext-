@@ -24,6 +24,7 @@ public class Shop {
     @JoinColumn(name = "contact_info_id", referencedColumnName = "id")
     private ContactInfo contactInfo;
 
+    // `mappedBy` verwijst naar het veld `shops` in de `User`-entiteit
     @ManyToMany(mappedBy = "shops")
     private Set<User> users = new HashSet<>();
 
