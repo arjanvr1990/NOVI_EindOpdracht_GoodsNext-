@@ -2,22 +2,25 @@ package com.arjanvanraamsdonk.goodsnext.dtos;
 
 public class ProductDto {
 
-    private Long productId; // Correct veldnaam gebruikt
+    private Long productId;
+    private Long shopId; // Voeg shopId toe
     private String productName;
     private String productDescription;
     private Double productPrice;
     private Boolean productAvailability;
     private String productImg;
 
-    // Constructor
+    // Constructor met alle velden, inclusief shopId
     public ProductDto(
             Long productId,
+            Long shopId,
             String productName,
             String productDescription,
             Double productPrice,
             Boolean productAvailability,
             String productImg) {
         this.productId = productId;
+        this.shopId = shopId;
         this.productName = productName;
         this.productDescription = productDescription;
         this.productPrice = productPrice;
@@ -25,17 +28,25 @@ public class ProductDto {
         this.productImg = productImg;
     }
 
-    // Default Constructor
+    // Default constructor
     public ProductDto() {
     }
 
-    // Getters and Setters
+    // Getters en Setters
     public Long getProductId() {
         return productId;
     }
 
     public void setProductId(Long productId) {
         this.productId = productId;
+    }
+
+    public Long getShopId() {
+        return shopId;
+    }
+
+    public void setShopId(Long shopId) {
+        this.shopId = shopId;
     }
 
     public String getProductName() {
