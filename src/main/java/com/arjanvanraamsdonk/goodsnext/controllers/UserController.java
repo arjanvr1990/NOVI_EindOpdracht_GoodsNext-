@@ -1,5 +1,6 @@
 package com.arjanvanraamsdonk.goodsnext.controllers;
 
+import com.arjanvanraamsdonk.goodsnext.dtos.ContactInfoDto;
 import com.arjanvanraamsdonk.goodsnext.dtos.UserDto;
 import com.arjanvanraamsdonk.goodsnext.services.UserService;
 import org.springframework.http.HttpStatus;
@@ -37,15 +38,13 @@ public class UserController {
     }
 
 
-
-
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
-        System.out.println("POST /api/users aangeroepen door: " + SecurityContextHolder.getContext().getAuthentication().getName());
-        UserDto createdUser = userService.createUser(userDto);
+    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto, @RequestBody(required = false) ContactInfoDto contactInfoDto) {
+        UserDto createdUser = userService.createUser(userDto, contactInfoDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
+
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")

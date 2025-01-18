@@ -1,8 +1,10 @@
 package com.arjanvanraamsdonk.goodsnext.services;
 
+import com.arjanvanraamsdonk.goodsnext.dtos.ContactInfoDto;
 import com.arjanvanraamsdonk.goodsnext.dtos.UserDto;
 import com.arjanvanraamsdonk.goodsnext.exceptions.RecordNotFoundException;
 import com.arjanvanraamsdonk.goodsnext.models.Authority;
+import com.arjanvanraamsdonk.goodsnext.models.ContactInfo;
 import com.arjanvanraamsdonk.goodsnext.models.User;
 import com.arjanvanraamsdonk.goodsnext.repositories.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,14 +42,27 @@ public class UserService {
 
 
 
-    public UserDto createUser(UserDto userDto) {
+    public UserDto createUser(UserDto userDto, ContactInfoDto contactInfoDto) {
         User user = new User();
         user.setUsername(userDto.getUsername());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setRoles(userDto.getRoles());
+
+        // Voeg contactinformatie toe als het aanwezig is
+        if (contactInfoDto != null) {
+            ContactInfo contactInfo = new ContactInfo();
+            contactInfo.setEmail(contactInfoDto.getEmail());
+            contactInfo.setCity(contactInfoDto.getCity());
+            contactInfo.setPostalCode(contactInfoDto.getPostalCode());
+            contactInfo.setAddress(contactInfoDto.getAddress());
+            contactInfo.setPhoneNumber(contactInfoDto.getPhoneNumber());
+            user.setContactInfo(contactInfo);
+        }
+
         userRepository.save(user);
         return new UserDto(user.getId(), user.getUsername(), null, user.getRoles());
     }
+
 
     public UserDto updateUser(Long id, UserDto userDto) {
         User user = userRepository.findById(id)

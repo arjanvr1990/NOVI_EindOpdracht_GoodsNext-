@@ -42,7 +42,20 @@ public class SpringSecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN") // Alleen toegankelijk voor ADMIN
                         .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("ADMIN") // Alleen toegankelijk voor ADMIN
                         .requestMatchers(HttpMethod.PUT, "/api/users/**").hasAnyRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/contactinfo").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/contactinfo/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/contactinfo/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/contactinfo/me").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/contactinfo/me").hasRole("USER")
+
+
+
+
+
                         .anyRequest().authenticated() // Alle andere endpoints vereisen authenticatie
+
+
                 )
 
                 .sessionManagement(session -> session

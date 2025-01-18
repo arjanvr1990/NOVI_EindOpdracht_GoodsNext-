@@ -1,13 +1,26 @@
 package com.arjanvanraamsdonk.goodsnext.dtos;
 
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 public class ContactInfoDto {
 
+    @Email(message = "Email should be valid")
+    @NotBlank(message = "Email is required")
     private String email;
+
+    @NotBlank(message = "City is required")
     private String city;
+
+    @NotBlank(message = "Postal code is required")
     private String postalCode;
+
+    @NotBlank(message = "Address is required")
     private String address;
+
+    @NotBlank(message = "Phone number is required")
     private String phoneNumber;
+
 
     // Default Constructor
     public ContactInfoDto() {
