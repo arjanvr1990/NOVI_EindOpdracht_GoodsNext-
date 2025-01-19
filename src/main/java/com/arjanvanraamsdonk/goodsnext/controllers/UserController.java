@@ -2,13 +2,14 @@ package com.arjanvanraamsdonk.goodsnext.controllers;
 
 import com.arjanvanraamsdonk.goodsnext.dtos.ContactInfoDto;
 import com.arjanvanraamsdonk.goodsnext.dtos.UserDto;
+import com.arjanvanraamsdonk.goodsnext.exceptions.RecordNotFoundException;
 import com.arjanvanraamsdonk.goodsnext.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -23,40 +24,42 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public List<UserDto> getAllUsers() {
-        return userService.getAllUsers();
+    public ResponseEntity<List<UserDto>> getAllUsers() {
+        List<UserDto> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
-        // Log de principal om te controleren wat beschikbaar is
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        System.out.println("Principal: " + principal);
-
-        return ResponseEntity.ok(userService.getUserById(id));
+        UserDto user = userService.getUserById(id);
+        return ResponseEntity.ok(user);
     }
-
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto, @RequestBody(required = false) ContactInfoDto contactInfoDto) {
+    public ResponseEntity<UserDto> createUser(
+            @RequestBody UserDto userDto,
+            @RequestBody(required = false) ContactInfoDto contactInfoDto) {
         UserDto createdUser = userService.createUser(userDto, contactInfoDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-    }
 
+        URI location = URI.create(String.format("/api/users/%d", createdUser.getId()));
+        return ResponseEntity.created(location).body(createdUser);
+    }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
-        return ResponseEntity.ok(userService.updateUser(id, userDto));
+    public ResponseEntity<Void> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
+        userService.updateUser(id, userDto);
+        return ResponseEntity.noContent().build();
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
+        if (!userService.deleteUser(id)) {
+            throw new RecordNotFoundException("User with ID " + id + " not found");
+        }
         return ResponseEntity.noContent().build();
     }
 }
-

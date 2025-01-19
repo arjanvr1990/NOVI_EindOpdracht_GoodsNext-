@@ -3,16 +3,13 @@ package com.arjanvanraamsdonk.goodsnext.services;
 import com.arjanvanraamsdonk.goodsnext.dtos.ContactInfoDto;
 import com.arjanvanraamsdonk.goodsnext.dtos.UserDto;
 import com.arjanvanraamsdonk.goodsnext.exceptions.RecordNotFoundException;
-import com.arjanvanraamsdonk.goodsnext.models.Authority;
 import com.arjanvanraamsdonk.goodsnext.models.ContactInfo;
 import com.arjanvanraamsdonk.goodsnext.models.User;
 import com.arjanvanraamsdonk.goodsnext.repositories.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,8 +23,6 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-
-
     public List<UserDto> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(user -> new UserDto(user.getId(), user.getUsername(), user.getRoles()))
@@ -36,11 +31,9 @@ public class UserService {
 
     public UserDto getUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("User not found"));
+                .orElseThrow(() -> new RecordNotFoundException("User with ID " + id + " not found"));
         return new UserDto(user.getId(), user.getUsername(), null, user.getRoles());
     }
-
-
 
     public UserDto createUser(UserDto userDto, ContactInfoDto contactInfoDto) {
         User user = new User();
@@ -48,7 +41,6 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setRoles(userDto.getRoles());
 
-        // Voeg contactinformatie toe als het aanwezig is
         if (contactInfoDto != null) {
             ContactInfo contactInfo = new ContactInfo();
             contactInfo.setEmail(contactInfoDto.getEmail());
@@ -63,22 +55,23 @@ public class UserService {
         return new UserDto(user.getId(), user.getUsername(), null, user.getRoles());
     }
 
-
-    public UserDto updateUser(Long id, UserDto userDto) {
+    public void updateUser(Long id, UserDto userDto) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("User not found"));
+                .orElseThrow(() -> new RecordNotFoundException("User with ID " + id + " not found"));
 
         user.setUsername(userDto.getUsername());
         if (userDto.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         }
-        user.setRoles(userDto.getRoles()); // Rollen bijwerken
+        user.setRoles(userDto.getRoles());
         userRepository.save(user);
-        return new UserDto(user.getId(), user.getUsername(), null, user.getRoles());
     }
 
-
-    public void deleteUser(Long id) {
+    public boolean deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            return false;
+        }
         userRepository.deleteById(id);
+        return true;
     }
 }
