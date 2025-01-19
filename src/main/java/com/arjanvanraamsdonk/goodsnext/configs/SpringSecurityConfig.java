@@ -37,12 +37,12 @@ public class SpringSecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Nieuwe manier om CSRF uit te schakelen
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/authentication/authenticate").permitAll() // Open endpoint voor authenticatie
-                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll() // Open endpoint voor gebruikersregistratie
-                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN") // Alleen toegankelijk voor ADMIN
-                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("ADMIN") // Alleen toegankelijk voor ADMIN
+                        .requestMatchers("/api/authentication/authenticate").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/users/**").hasAnyRole("ADMIN")
-
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasAnyRole("ADMIN")
 
                         .requestMatchers(HttpMethod.GET, "/api/contactinfo").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/contactinfo/**").hasRole("ADMIN")
@@ -51,19 +51,28 @@ public class SpringSecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/contactinfo/me").hasRole("USER")
 
 
-                        .requestMatchers(HttpMethod.GET, "/api/shops/**").hasAnyRole("USER", "ADMIN") // USER en ADMIN kunnen shops bekijken
-                        .requestMatchers(HttpMethod.POST, "/api/shops").hasRole("ADMIN") // Alleen ADMIN kan shops aanmaken
-                        .requestMatchers(HttpMethod.PUT, "/api/shops/**").hasRole("ADMIN") // Alleen ADMIN kan shops bijwerken
-                        .requestMatchers(HttpMethod.PATCH, "/api/shops/**").hasRole("ADMIN") // Alleen ADMIN kan gedeeltelijke updates uitvoeren
+                        .requestMatchers(HttpMethod.GET, "/api/shops/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/shops").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/shops/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/shops/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/shops/**").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/products/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/products").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/photos/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/photos").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/photos").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/photos/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/photos/**").hasRole("ADMIN")
 
 
-                        .requestMatchers(HttpMethod.GET, "/api/products/**").hasAnyRole("USER", "ADMIN") // USER en ADMIN kunnen producten bekijken
-                        .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN") // Alleen ADMIN kan producten aanmaken
-                        .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN") // Alleen ADMIN kan producten bijwerken
-                        .requestMatchers(HttpMethod.PATCH, "/api/products/**").hasRole("ADMIN") // Alleen ADMIN kan gedeeltelijke updates uitvoeren
 
-
-                        .anyRequest().authenticated() // Alle andere endpoints vereisen authenticatie
+                        .anyRequest().authenticated()
 
 
                 )
