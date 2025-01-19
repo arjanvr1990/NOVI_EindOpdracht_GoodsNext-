@@ -39,6 +39,26 @@ public class PhotoUploadService {
         return photoUploads.stream().map(this::transferToDto).collect(Collectors.toList());
     }
 
+    public PhotoUploadDto updatePhotoUpload(Long id, PhotoUploadInputDto inputDto) {
+        PhotoUpload photoUpload = photoUploadRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("PhotoUpload not found with ID: " + id));
+
+        // Update fields
+        photoUpload.setFileName(inputDto.getFileName());
+        photoUpload.setFileType(inputDto.getFileType());
+        photoUpload.setFileSize(inputDto.getFileSize());
+
+        PhotoUpload updatedPhotoUpload = photoUploadRepository.save(photoUpload);
+        return transferToDto(updatedPhotoUpload);
+    }
+
+    public void deletePhotoUpload(Long id) {
+        if (!photoUploadRepository.existsById(id)) {
+            throw new RuntimeException("PhotoUpload not found with ID: " + id);
+        }
+        photoUploadRepository.deleteById(id);
+    }
+
     private PhotoUploadDto transferToDto(PhotoUpload photoUpload) {
         PhotoUploadDto dto = new PhotoUploadDto();
         dto.setId(photoUpload.getId());
