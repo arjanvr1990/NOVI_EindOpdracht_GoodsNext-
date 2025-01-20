@@ -1,8 +1,7 @@
 package com.arjanvanraamsdonk.goodsnext.controllers;
 
-
-
 import com.arjanvanraamsdonk.goodsnext.dtos.ContactInfoDto;
+import com.arjanvanraamsdonk.goodsnext.dtos.ContactInfoInputDto;
 import com.arjanvanraamsdonk.goodsnext.services.ContactInfoService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -36,30 +35,26 @@ public class ContactInfoController {
     @GetMapping("/me")
     public ResponseEntity<ContactInfoDto> getMyContactInfo() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        ContactInfoDto contactInfo = contactInfoService.getContactInfoByUsername(username);
-        return ResponseEntity.ok(contactInfo);
+        return ResponseEntity.ok(contactInfoService.getContactInfoByUsername(username));
     }
 
     @PreAuthorize("hasRole('USER')")
     @PutMapping("/me")
-    public ResponseEntity<ContactInfoDto> updateMyContactInfo(@Valid @RequestBody ContactInfoDto contactInfoDto) {
+    public ResponseEntity<ContactInfoDto> updateMyContactInfo(@Valid @RequestBody ContactInfoInputDto inputDto) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        ContactInfoDto updatedContactInfo = contactInfoService.updateContactInfoByUsername(username, contactInfoDto);
-        return ResponseEntity.ok(updatedContactInfo);
+        return ResponseEntity.ok(contactInfoService.updateContactInfoByUsername(username, inputDto));
     }
 
     @PostMapping
-    public ResponseEntity<ContactInfoDto> addContactInfo(@Valid @RequestBody ContactInfoDto contactInfoDto) {
-        ContactInfoDto createdContactInfo = contactInfoService.addContactInfo(contactInfoDto);
-        return ResponseEntity.ok(createdContactInfo);
+    public ResponseEntity<ContactInfoDto> addContactInfo(@Valid @RequestBody ContactInfoInputDto inputDto) {
+        return ResponseEntity.ok(contactInfoService.addContactInfo(inputDto));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ContactInfoDto> updateContactInfo(
-            @PathVariable Long id, @Valid @RequestBody ContactInfoDto contactInfoDto) {
-        return ResponseEntity.ok(contactInfoService.updateContactInfo(id, contactInfoDto));
+            @PathVariable Long id, @Valid @RequestBody ContactInfoInputDto inputDto) {
+        return ResponseEntity.ok(contactInfoService.updateContactInfo(id, inputDto));
     }
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteContactInfo(@PathVariable Long id) {

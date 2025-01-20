@@ -1,6 +1,7 @@
 package com.arjanvanraamsdonk.goodsnext.services;
 
 import com.arjanvanraamsdonk.goodsnext.dtos.ContactInfoDto;
+import com.arjanvanraamsdonk.goodsnext.dtos.ContactInfoInputDto;
 import com.arjanvanraamsdonk.goodsnext.exceptions.RecordNotFoundException;
 import com.arjanvanraamsdonk.goodsnext.models.ContactInfo;
 import com.arjanvanraamsdonk.goodsnext.models.User;
@@ -9,7 +10,6 @@ import com.arjanvanraamsdonk.goodsnext.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,79 +18,65 @@ public class ContactInfoService {
     private final ContactInfoRepository contactInfoRepository;
     private final UserRepository userRepository;
 
-    // Constructor-injectie van beide repositories
     public ContactInfoService(ContactInfoRepository contactInfoRepository, UserRepository userRepository) {
         this.contactInfoRepository = contactInfoRepository;
         this.userRepository = userRepository;
     }
 
-    public ContactInfo saveContactInfo(ContactInfo contactInfo) {
-        return contactInfoRepository.save(contactInfo);
-    }
-
     public List<ContactInfoDto> getAllContactInfo() {
         List<ContactInfo> contactInfoList = contactInfoRepository.findAll();
-        return contactInfoList.stream().map(this::transferToDto).collect(Collectors.toList());
+        return contactInfoList.stream()
+                .map(this::fromContactInfo)
+                .collect(Collectors.toList());
     }
 
     public ContactInfoDto getContactInfoById(Long id) {
-        Optional<ContactInfo> contactInfo = contactInfoRepository.findById(id);
-        if (contactInfo.isPresent()) {
-            return transferToDto(contactInfo.get());
-        } else {
-            throw new RecordNotFoundException("No ContactInfo found with id: " + id);
-        }
+        ContactInfo contactInfo = contactInfoRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("No ContactInfo found with id: " + id));
+        return fromContactInfo(contactInfo);
     }
 
     public ContactInfoDto getContactInfoByUsername(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RecordNotFoundException("User not found"));
-        if (user.getContactInfo() == null) {
-            throw new RecordNotFoundException("No contact info found for user");
+                .orElseThrow(() -> new RecordNotFoundException("User not found with username: " + username));
+        ContactInfo contactInfo = user.getContactInfo();
+        if (contactInfo == null) {
+            throw new RecordNotFoundException("No contact info found for user with username: " + username);
         }
-        return transferToDto(user.getContactInfo());
+        return fromContactInfo(contactInfo);
     }
 
-    public ContactInfoDto updateContactInfoByUsername(String username, ContactInfoDto contactInfoDto) {
+    public ContactInfoDto updateContactInfoByUsername(String username, ContactInfoInputDto contactInfoInputDto) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RecordNotFoundException("User not found"));
+                .orElseThrow(() -> new RecordNotFoundException("User not found with username: " + username));
 
         ContactInfo contactInfo = user.getContactInfo();
         if (contactInfo == null) {
-            contactInfo = new ContactInfo();
+            contactInfo = toContactInfo(contactInfoInputDto);
             user.setContactInfo(contactInfo);
+        } else {
+            updateContactInfoFields(contactInfo, contactInfoInputDto);
         }
-
-        contactInfo.setEmail(contactInfoDto.getEmail());
-        contactInfo.setCity(contactInfoDto.getCity());
-        contactInfo.setPostalCode(contactInfoDto.getPostalCode());
-        contactInfo.setAddress(contactInfoDto.getAddress());
-        contactInfo.setPhoneNumber(contactInfoDto.getPhoneNumber());
 
         userRepository.save(user);
-        return transferToDto(contactInfo);
+        return fromContactInfo(contactInfo);
     }
 
-    public ContactInfoDto addContactInfo(ContactInfoDto dto) {
-        ContactInfo contactInfo = transferToEntity(dto);
-        contactInfoRepository.save(contactInfo);
-        return transferToDto(contactInfo);
-    }
-
-    public ContactInfoDto updateContactInfo(Long id, ContactInfoDto dto) {
-        Optional<ContactInfo> contactInfoOptional = contactInfoRepository.findById(id);
-        if (contactInfoOptional.isPresent()) {
-            ContactInfo contactInfo = contactInfoOptional.get();
-            contactInfo.setEmail(dto.getEmail());
-            contactInfo.setCity(dto.getCity());
-            contactInfo.setPostalCode(dto.getPostalCode());
-            contactInfo.setAddress(dto.getAddress());
-            contactInfo.setPhoneNumber(dto.getPhoneNumber());
-            contactInfoRepository.save(contactInfo);
-            return transferToDto(contactInfo);
-        } else {
-            throw new RecordNotFoundException("No ContactInfo found with id: " + id);
+    public ContactInfoDto addContactInfo(ContactInfoInputDto contactInfoInputDto) {
+        if (contactInfoInputDto == null) {
+            throw new IllegalArgumentException("Input data for creating contact info cannot be null");
         }
+        ContactInfo contactInfo = toContactInfo(contactInfoInputDto);
+        contactInfoRepository.save(contactInfo);
+        return fromContactInfo(contactInfo);
+    }
+
+    public ContactInfoDto updateContactInfo(Long id, ContactInfoInputDto contactInfoInputDto) {
+        ContactInfo contactInfo = contactInfoRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("No ContactInfo found with id: " + id));
+        updateContactInfoFields(contactInfo, contactInfoInputDto);
+        contactInfoRepository.save(contactInfo);
+        return fromContactInfo(contactInfo);
     }
 
     public void deleteContactInfo(Long id) {
@@ -101,17 +87,7 @@ public class ContactInfoService {
         }
     }
 
-    public ContactInfo transferToEntity(ContactInfoDto dto) {
-        ContactInfo contactInfo = new ContactInfo();
-        contactInfo.setEmail(dto.getEmail());
-        contactInfo.setCity(dto.getCity());
-        contactInfo.setPostalCode(dto.getPostalCode());
-        contactInfo.setAddress(dto.getAddress());
-        contactInfo.setPhoneNumber(dto.getPhoneNumber());
-        return contactInfo;
-    }
-
-    public ContactInfoDto transferToDto(ContactInfo contactInfo) {
+    private ContactInfoDto fromContactInfo(ContactInfo contactInfo) {
         ContactInfoDto dto = new ContactInfoDto();
         dto.setEmail(contactInfo.getEmail());
         dto.setCity(contactInfo.getCity());
@@ -119,5 +95,23 @@ public class ContactInfoService {
         dto.setAddress(contactInfo.getAddress());
         dto.setPhoneNumber(contactInfo.getPhoneNumber());
         return dto;
+    }
+
+    private ContactInfo toContactInfo(ContactInfoInputDto inputDto) {
+        ContactInfo contactInfo = new ContactInfo();
+        contactInfo.setEmail(inputDto.getEmail());
+        contactInfo.setCity(inputDto.getCity());
+        contactInfo.setPostalCode(inputDto.getPostalCode());
+        contactInfo.setAddress(inputDto.getAddress());
+        contactInfo.setPhoneNumber(inputDto.getPhoneNumber());
+        return contactInfo;
+    }
+
+    private void updateContactInfoFields(ContactInfo contactInfo, ContactInfoInputDto inputDto) {
+        contactInfo.setEmail(inputDto.getEmail());
+        contactInfo.setCity(inputDto.getCity());
+        contactInfo.setPostalCode(inputDto.getPostalCode());
+        contactInfo.setAddress(inputDto.getAddress());
+        contactInfo.setPhoneNumber(inputDto.getPhoneNumber());
     }
 }
