@@ -23,11 +23,8 @@ public class ProductController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping
-    public List<ProductDto> getAllProducts(@RequestParam(value = "productName", required = false) String productName) {
-        if (productName == null) {
-            return productService.getAllProducts();
-        }
-        return productService.getAllProductsByName(productName);
+    public List<ProductDto> getAllProducts() {
+        return productService.getAllProducts();
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
@@ -40,7 +37,7 @@ public class ProductController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ProductDto> createProduct(@Valid @RequestBody ProductInputDto productInputDto) {
-        ProductDto createdProduct = productService.addProduct(productInputDto);
+        ProductDto createdProduct = productService.createProduct(productInputDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
 
@@ -48,13 +45,6 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id, @RequestBody ProductInputDto productInputDto) {
         ProductDto updatedProduct = productService.updateProduct(id, productInputDto);
-        return ResponseEntity.ok(updatedProduct);
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping("/{id}")
-    public ResponseEntity<ProductDto> updatePartialProduct(@PathVariable Long id, @RequestBody ProductInputDto productInputDto) {
-        ProductDto updatedProduct = productService.updatePartialProduct(id, productInputDto);
         return ResponseEntity.ok(updatedProduct);
     }
 

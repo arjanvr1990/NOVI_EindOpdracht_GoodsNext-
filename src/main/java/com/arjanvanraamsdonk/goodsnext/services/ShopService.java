@@ -42,39 +42,59 @@ public class ShopService {
     }
 
     public ShopDto getShopById(Long id) {
-        Shop shop = shopRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("Shop not found with ID: " + id));
-        return fromShop(shop);
+        Shop shop = shopRepository.findById(id).orElse(null);
+        if (shop != null) {
+            return fromShop(shop);
+        } else {
+            throw new RecordNotFoundException("Shop not found with ID: " + id);
+        }
     }
 
     public ShopDto addShop(ShopInputDto shopInputDto) {
-        Shop shop = toShop(shopInputDto);
-        if (shopInputDto.getLogo() != null) {
-            PhotoUpload logo = photoUploadRepository.findById(shopInputDto.getLogo())
-                    .orElseThrow(() -> new RecordNotFoundException("PhotoUpload not found with ID: " + shopInputDto.getLogo()));
-            shop.setLogo(logo);
+        if (shopInputDto != null) {
+            Shop shop = toShop(shopInputDto);
+
+            if (shopInputDto.getLogo() != null) {
+                PhotoUpload logo = photoUploadRepository.findById(shopInputDto.getLogo()).orElse(null);
+                if (logo != null) {
+                    shop.setLogo(logo);
+                } else {
+                    throw new RecordNotFoundException("PhotoUpload not found with ID: " + shopInputDto.getLogo());
+                }
+            }
+
+            Shop savedShop = shopRepository.save(shop);
+            return fromShop(savedShop);
+        } else {
+            throw new IllegalArgumentException("Input data for creating shop cannot be null");
         }
-        Shop savedShop = shopRepository.save(shop);
-        return fromShop(savedShop);
     }
 
+
     public ShopDto updateShop(Long id, ShopInputDto shopInputDto) {
-        Shop shop = shopRepository.findById(id).orElseThrow(() -> new RecordNotFoundException("Shop not found with ID: " + id));
-        shop.setShopName(shopInputDto.getShopName());
+        Shop shop = shopRepository.findById(id).orElse(null);
+        if (shop != null) {
+            shop.setShopName(shopInputDto.getShopName());
 
-        if (shopInputDto.getContactInfo() != null) {
-            ContactInfo contactInfo = toContactInfo(shopInputDto.getContactInfo());
-            shop.setContactInfo(contactInfoRepository.save(contactInfo));
+            if (shopInputDto.getContactInfo() != null) {
+                ContactInfo contactInfo = toContactInfo(shopInputDto.getContactInfo());
+                shop.setContactInfo(contactInfoRepository.save(contactInfo));
+            }
+
+            if (shopInputDto.getLogo() != null) {
+                PhotoUpload logo = photoUploadRepository.findById(shopInputDto.getLogo()).orElse(null);
+                if (logo != null) {
+                    shop.setLogo(logo);
+                } else {
+                    throw new RecordNotFoundException("PhotoUpload not found with ID: " + shopInputDto.getLogo());
+                }
+            }
+
+            Shop updatedShop = shopRepository.save(shop);
+            return fromShop(updatedShop);
+        } else {
+            throw new RecordNotFoundException("Shop not found with ID: " + id);
         }
-
-        if (shopInputDto.getLogo() != null) {
-            PhotoUpload logo = photoUploadRepository.findById(shopInputDto.getLogo())
-                    .orElseThrow(() -> new RecordNotFoundException("PhotoUpload not found with ID: " + shopInputDto.getLogo()));
-            shop.setLogo(logo);
-        }
-
-        Shop updatedShop = shopRepository.save(shop);
-        return fromShop(updatedShop);
     }
 
     public ShopDto updatePartialShop(Long id, ShopInputDto shopInputDto) {
@@ -98,6 +118,15 @@ public class ShopService {
         Shop updatedShop = shopRepository.save(shop);
         return fromShop(updatedShop);
     }
+
+    public void deleteShop(Long id) {
+        if (shopRepository.existsById(id)) {
+            shopRepository.deleteById(id);
+        } else {
+            throw new RecordNotFoundException("Shop not found with ID: " + id);
+        }
+    }
+
 
     private ShopDto fromShop(Shop shop) {
         ShopDto dto = new ShopDto();
