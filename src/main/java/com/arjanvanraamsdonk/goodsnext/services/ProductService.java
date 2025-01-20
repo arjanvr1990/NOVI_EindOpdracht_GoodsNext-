@@ -5,7 +5,9 @@ import com.arjanvanraamsdonk.goodsnext.dtos.ProductDto;
 import com.arjanvanraamsdonk.goodsnext.dtos.ProductInputDto;
 import com.arjanvanraamsdonk.goodsnext.exceptions.RecordNotFoundException;
 import com.arjanvanraamsdonk.goodsnext.models.Product;
+import com.arjanvanraamsdonk.goodsnext.models.Shop;
 import com.arjanvanraamsdonk.goodsnext.repositories.ProductRepository;
+import com.arjanvanraamsdonk.goodsnext.repositories.ShopRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,9 +17,11 @@ import java.util.stream.Collectors;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final ShopRepository shopRepository; // Voeg ShopRepository toe
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, ShopRepository shopRepository) {
         this.productRepository = productRepository;
+        this.shopRepository = shopRepository; // Injecteer ShopRepository
     }
 
     public List<ProductDto> getAllProducts() {
@@ -37,14 +41,28 @@ public class ProductService {
     }
 
     public ProductDto createProduct(ProductInputDto inputDto) {
-        if (inputDto != null) {
-            Product product = toEntity(inputDto);
-            Product savedProduct = productRepository.save(product);
-            return toDto(savedProduct);
-        } else {
+        if (inputDto == null) {
             throw new IllegalArgumentException("Input data for creating product cannot be null");
         }
+
+        // Controleer of shopId niet null is en haal de bijbehorende Shop op
+        if (inputDto.getShopId() == null) {
+            throw new IllegalArgumentException("Shop ID cannot be null");
+        }
+        Shop shop = shopRepository.findById(inputDto.getShopId())
+                .orElseThrow(() -> new RecordNotFoundException("Shop not found with ID: " + inputDto.getShopId()));
+
+        // Zet de input om naar een Product-entiteit
+        Product product = toEntity(inputDto);
+
+        // Koppel de Shop aan het Product
+        product.setShop(shop);
+
+        // Sla het product op en retourneer de DTO
+        Product savedProduct = productRepository.save(product);
+        return toDto(savedProduct);
     }
+
 
     public ProductDto updateProduct(Long id, ProductInputDto inputDto) {
         Product product = productRepository.findById(id).orElse(null);
@@ -83,8 +101,18 @@ public class ProductService {
         product.setProductDescription(inputDto.getProductDescription());
         product.setProductPrice(inputDto.getProductPrice());
         product.setProductAvailability(inputDto.getProductAvailability());
+
+        if (inputDto.getShopId() != null) {
+            Shop shop = shopRepository.findById(inputDto.getShopId())
+                    .orElseThrow(() -> new RecordNotFoundException("Shop not found with ID: " + inputDto.getShopId()));
+            product.setShop(shop);
+        } else {
+            throw new IllegalArgumentException("Shop ID cannot be null");
+        }
+
         return product;
     }
+
 
     private void updateProductFields(Product product, ProductInputDto inputDto) {
         product.setProductName(inputDto.getProductName());
