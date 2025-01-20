@@ -2,6 +2,7 @@ package com.arjanvanraamsdonk.goodsnext.services;
 
 import com.arjanvanraamsdonk.goodsnext.dtos.ContactInfoDto;
 import com.arjanvanraamsdonk.goodsnext.dtos.UserDto;
+import com.arjanvanraamsdonk.goodsnext.dtos.UserInputDto;
 import com.arjanvanraamsdonk.goodsnext.exceptions.RecordNotFoundException;
 import com.arjanvanraamsdonk.goodsnext.models.ContactInfo;
 import com.arjanvanraamsdonk.goodsnext.models.User;
@@ -35,19 +36,19 @@ public class UserService {
         return new UserDto(user.getId(), user.getUsername(), null, user.getRoles());
     }
 
-    public UserDto createUser(UserDto userDto, ContactInfoDto contactInfoDto) {
+    public UserDto createUser(UserInputDto userInputDto) {
         User user = new User();
-        user.setUsername(userDto.getUsername());
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setRoles(userDto.getRoles());
+        user.setUsername(userInputDto.getUsername());
+        user.setPassword(passwordEncoder.encode(userInputDto.getPassword()));
+        user.setRoles(userInputDto.getAuthorities().stream().collect(Collectors.toSet()));
 
-        if (contactInfoDto != null) {
+        if (userInputDto.getContactInfo() != null) {
             ContactInfo contactInfo = new ContactInfo();
-            contactInfo.setEmail(contactInfoDto.getEmail());
-            contactInfo.setCity(contactInfoDto.getCity());
-            contactInfo.setPostalCode(contactInfoDto.getPostalCode());
-            contactInfo.setAddress(contactInfoDto.getAddress());
-            contactInfo.setPhoneNumber(contactInfoDto.getPhoneNumber());
+            contactInfo.setEmail(userInputDto.getContactInfo().getEmail());
+            contactInfo.setCity(userInputDto.getContactInfo().getCity());
+            contactInfo.setPostalCode(userInputDto.getContactInfo().getPostalCode());
+            contactInfo.setAddress(userInputDto.getContactInfo().getAddress());
+            contactInfo.setPhoneNumber(userInputDto.getContactInfo().getPhoneNumber());
             user.setContactInfo(contactInfo);
         }
 
@@ -55,15 +56,30 @@ public class UserService {
         return new UserDto(user.getId(), user.getUsername(), null, user.getRoles());
     }
 
-    public void updateUser(Long id, UserDto userDto) {
+
+    public void updateUser(Long id, UserInputDto userInputDto) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException("User with ID " + id + " not found"));
 
-        user.setUsername(userDto.getUsername());
-        if (userDto.getPassword() != null) {
-            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        user.setUsername(userInputDto.getUsername());
+        if (userInputDto.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(userInputDto.getPassword()));
         }
-        user.setRoles(userDto.getRoles());
+        user.setRoles(userInputDto.getAuthorities().stream().collect(Collectors.toSet()));
+
+        if (userInputDto.getContactInfo() != null) {
+            ContactInfo contactInfo = user.getContactInfo();
+            if (contactInfo == null) {
+                contactInfo = new ContactInfo();
+                user.setContactInfo(contactInfo);
+            }
+            contactInfo.setEmail(userInputDto.getContactInfo().getEmail());
+            contactInfo.setCity(userInputDto.getContactInfo().getCity());
+            contactInfo.setPostalCode(userInputDto.getContactInfo().getPostalCode());
+            contactInfo.setAddress(userInputDto.getContactInfo().getAddress());
+            contactInfo.setPhoneNumber(userInputDto.getContactInfo().getPhoneNumber());
+        }
+
         userRepository.save(user);
     }
 

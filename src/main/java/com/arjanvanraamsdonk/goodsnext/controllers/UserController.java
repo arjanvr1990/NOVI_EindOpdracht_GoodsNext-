@@ -2,8 +2,10 @@ package com.arjanvanraamsdonk.goodsnext.controllers;
 
 import com.arjanvanraamsdonk.goodsnext.dtos.ContactInfoDto;
 import com.arjanvanraamsdonk.goodsnext.dtos.UserDto;
+import com.arjanvanraamsdonk.goodsnext.dtos.UserInputDto;
 import com.arjanvanraamsdonk.goodsnext.exceptions.RecordNotFoundException;
 import com.arjanvanraamsdonk.goodsnext.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -37,11 +39,9 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping
     public ResponseEntity<UserDto> createUser(
-            @RequestBody UserDto userDto,
-            @RequestBody(required = false) ContactInfoDto contactInfoDto) {
-        UserDto createdUser = userService.createUser(userDto, contactInfoDto);
+            @Valid @RequestBody UserInputDto userInputDto) {
+        UserDto createdUser = userService.createUser(userInputDto);
 
         URI location = URI.create(String.format("/api/users/%d", createdUser.getId()));
         return ResponseEntity.created(location).body(createdUser);
@@ -49,8 +49,8 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
-        userService.updateUser(id, userDto);
+    public ResponseEntity<Void> updateUser(@PathVariable Long id, @Valid @RequestBody UserInputDto userInputDto) {
+        userService.updateUser(id, userInputDto);
         return ResponseEntity.noContent().build();
     }
 
