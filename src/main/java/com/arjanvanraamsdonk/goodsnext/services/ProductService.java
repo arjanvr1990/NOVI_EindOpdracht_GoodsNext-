@@ -17,11 +17,11 @@ import java.util.stream.Collectors;
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final ShopRepository shopRepository; // Voeg ShopRepository toe
+    private final ShopRepository shopRepository;
 
     public ProductService(ProductRepository productRepository, ShopRepository shopRepository) {
         this.productRepository = productRepository;
-        this.shopRepository = shopRepository; // Injecteer ShopRepository
+        this.shopRepository = shopRepository;
     }
 
     public List<ProductDto> getAllProducts() {
@@ -87,6 +87,7 @@ public class ProductService {
     private ProductDto toDto(Product product) {
         ProductDto dto = new ProductDto();
         dto.setProductId(product.getId());
+        dto.setShopId(product.getShop() != null ? product.getShop().getShopId() : null); // Voeg shopId mapping toe
         dto.setProductName(product.getProductName());
         dto.setProductDescription(product.getProductDescription());
         dto.setProductPrice(product.getProductPrice());
