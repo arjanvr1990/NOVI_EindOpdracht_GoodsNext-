@@ -10,7 +10,7 @@ public class Shop {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "shop_id") // Zorgt ervoor dat de databasekolom correct wordt gebruikt
+    @Column(name = "shop_id")
     private Long shopId;
 
     @Column(name = "shop_name", nullable = false)
@@ -27,7 +27,7 @@ public class Shop {
     @ManyToMany(mappedBy = "shops")
     private Set<User> users = new HashSet<>();
 
-    // Een bidirectionele relatie naar Product toevoegen
+
     @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Product> products = new HashSet<>();
 

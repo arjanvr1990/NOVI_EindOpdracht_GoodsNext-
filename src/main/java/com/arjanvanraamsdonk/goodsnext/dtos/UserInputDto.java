@@ -6,13 +6,13 @@ public class UserInputDto {
     private String username;
     private String password;
     private ContactInfoDto contactInfo;
-    private List<String> authorities; // Gebruik strings voor authority-namen
+    private List<String> authorities;
 
-    // Default Constructor
+
     public UserInputDto() {
     }
 
-    // Getters and Setters
+
     public String getUsername() {
         return username;
     }
@@ -38,10 +38,10 @@ public class UserInputDto {
     }
 
     public List<String> getAuthorities() {
-        return authorities; // Verander "roles" naar "authorities"
+        return authorities;
     }
 
     public void setAuthorities(List<String> authorities) {
-        this.authorities = authorities; // Verander "roles" naar "authorities"
+        this.authorities = authorities;
     }
 }
