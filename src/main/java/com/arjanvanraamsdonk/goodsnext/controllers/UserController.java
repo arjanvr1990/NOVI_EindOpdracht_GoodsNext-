@@ -1,14 +1,11 @@
 package com.arjanvanraamsdonk.goodsnext.controllers;
 
-import com.arjanvanraamsdonk.goodsnext.dtos.ContactInfoDto;
 import com.arjanvanraamsdonk.goodsnext.dtos.UserDto;
 import com.arjanvanraamsdonk.goodsnext.dtos.UserInputDto;
 import com.arjanvanraamsdonk.goodsnext.exceptions.RecordNotFoundException;
 import com.arjanvanraamsdonk.goodsnext.services.UserService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
