@@ -6,7 +6,7 @@ public class ShopInputDto {
 
     @NotBlank(message = "Shop name is mandatory")
     private String shopName;
-    private Long logo; // ID van PhotoUpload
+    private Long logo;
     private ContactInfoDto contactInfo;
 
     // Getters en Setters

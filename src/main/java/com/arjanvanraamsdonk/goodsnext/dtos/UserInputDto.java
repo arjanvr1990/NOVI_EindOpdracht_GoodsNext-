@@ -1,12 +1,21 @@
 package com.arjanvanraamsdonk.goodsnext.dtos;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+
 import java.util.List;
 
 public class UserInputDto {
+    @NotBlank(message = "Username is mandatory")
     private String username;
+
+    @NotBlank(message = "Password is mandatory")
     private String password;
-    private ContactInfoDto contactInfo;
+
+    @NotEmpty(message = "At least one authority is required")
     private List<String> authorities;
+
+    private ContactInfoDto contactInfo;
 
 
     public UserInputDto() {
