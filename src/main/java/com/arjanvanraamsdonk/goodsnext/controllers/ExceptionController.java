@@ -15,7 +15,6 @@ public class ExceptionController {
     public ResponseEntity<Object> exception(RecordNotFoundException exception) {
 
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
-
     }
 
 
@@ -23,15 +22,11 @@ public class ExceptionController {
     public ResponseEntity<Object> exception(IndexOutOfBoundsException exception) {
 
         return new ResponseEntity<>("Dit id staat niet in de database", HttpStatus.NOT_FOUND);
-
     }
 
     @ExceptionHandler(value = ProductNameTooLongException.class)
     public ResponseEntity<String> exception(ProductNameTooLongException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
-
-
-
 }
 

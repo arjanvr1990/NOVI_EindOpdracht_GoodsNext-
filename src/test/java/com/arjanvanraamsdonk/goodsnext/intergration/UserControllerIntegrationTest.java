@@ -1,7 +1,6 @@
 package com.arjanvanraamsdonk.goodsnext.intergration;
 
-import com.arjanvanraamsdonk.goodsnext.dtos.ContactInfoDto;
-import com.arjanvanraamsdonk.goodsnext.dtos.ShopInputDto;
+
 import com.arjanvanraamsdonk.goodsnext.dtos.UserInputDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -126,7 +125,4 @@ public class UserControllerIntegrationTest {
                 .andDo(print())
                 .andExpect(status().isNoContent());
     }
-
-
-
 }

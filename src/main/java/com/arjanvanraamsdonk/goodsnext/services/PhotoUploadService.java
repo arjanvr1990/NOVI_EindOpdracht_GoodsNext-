@@ -62,7 +62,6 @@ public class PhotoUploadService {
         }
     }
 
-    // Helper methods
     private PhotoUploadDto toDto(PhotoUpload photoUpload) {
         PhotoUploadDto dto = new PhotoUploadDto();
         dto.setId(photoUpload.getId());

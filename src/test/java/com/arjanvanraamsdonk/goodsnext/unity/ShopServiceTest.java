@@ -1,4 +1,4 @@
-package com.arjanvanraamsdonk.goodsnext;
+package com.arjanvanraamsdonk.goodsnext.unity;
 
 import com.arjanvanraamsdonk.goodsnext.dtos.ContactInfoDto;
 import com.arjanvanraamsdonk.goodsnext.dtos.ShopDto;
@@ -334,7 +334,7 @@ class ShopServiceTest {
         existingShop.setShopId(shopId);
 
         ShopInputDto inputDto = new ShopInputDto();
-        inputDto.setLogo(2L); // Non-existent logo ID
+        inputDto.setLogo(2L);
 
         when(shopRepository.findById(shopId)).thenReturn(Optional.of(existingShop));
         when(photoUploadRepository.findById(2L)).thenReturn(Optional.empty());
@@ -439,7 +439,4 @@ class ShopServiceTest {
 
         verify(shopRepository, times(1)).save(any(Shop.class));
     }
-
-
-
 }

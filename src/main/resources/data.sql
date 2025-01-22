@@ -3,22 +3,22 @@ INSERT INTO users (username, password) VALUES
                                            ('admin', '$2a$12$wGGxeb9hbrMEIDomwSpHWeG6ZhGcZ7z3vULAXl6iWSSDPKlpwVzO6'), -- password: admin
                                            ('user', '$2a$12$TzVjQpybrq7qlBtXMTtFuO5a.P9RpoNV8VwZQZmoYQaixzYwWodIO'); -- password: user
 
--- Voeg autoriteiten toe
+
 INSERT INTO authorities (user_id, authority) VALUES
                                                  (1, 'ROLE_ADMIN'),
                                                  (1, 'ROLE_USER'),
                                                  (2, 'ROLE_USER');
 
--- Voeg ContactInfo toe
+
 INSERT INTO contact_info (email, city, postal_code, address, phone_number) VALUES
                                                                                ('admin@example.com', 'Amsterdam', '1234AB', 'Admin Street 1', '0612345678'),
                                                                                ('user@example.com', 'Rotterdam', '5678CD', 'User Street 2', '0698765432');
 
--- Koppel ContactInfo aan gebruikers
+
 UPDATE users SET contact_info_id = 1 WHERE username = 'admin';
 UPDATE users SET contact_info_id = 2 WHERE username = 'user';
 
--- Voeg shops toe
+
 INSERT INTO contact_info (email, city, postal_code, address, phone_number) VALUES
                                                                                ('shop1@example.com', 'Utrecht', '1234AA', 'Shop Street 1', '0611111111'),
                                                                                ('shop2@example.com', 'Den Haag', '5678BB', 'Shop Street 2', '0622222222'),
@@ -38,7 +38,7 @@ INSERT INTO photo_uploads (file_name, file_type, file_size) VALUES
                                                                 ('logo2.jpg', 'image/jpeg', 54321);
 
 
--- Voeg producten toe aan shops
+
 INSERT INTO product (product_name, product_description, product_price, product_availability, product_img, shop_id) VALUES
                                                                                                                        ('Laptop', 'High-performance laptop', 999.99, true, 'laptop.png', 1),
                                                                                                                        ('Mouse', 'Wireless mouse', 29.99, true, 'mouse.png', 1),

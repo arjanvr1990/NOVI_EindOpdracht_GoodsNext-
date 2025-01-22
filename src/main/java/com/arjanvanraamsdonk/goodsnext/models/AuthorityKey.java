@@ -4,10 +4,10 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class AuthorityKey implements Serializable {
-    private Long user; // Zorg dat dit overeenkomt met `user_id`
+    private Long user;
     private String authority;
 
-    // Getters, setters, equals en hashCode
+
     public Long getUser() {
         return user;
     }

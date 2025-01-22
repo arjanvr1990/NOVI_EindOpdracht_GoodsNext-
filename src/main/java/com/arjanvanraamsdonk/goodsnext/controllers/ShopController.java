@@ -22,7 +22,6 @@ public class ShopController {
         this.shopService = shopService;
     }
 
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @GetMapping("/shops")
     public ResponseEntity<List<ShopDto>> getAllShops(@RequestParam(value = "shopName", required = false) String shopName) {
         List<ShopDto> shops;
@@ -34,14 +33,12 @@ public class ShopController {
         return ResponseEntity.ok().body(shops);
     }
 
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @GetMapping("/shops/{id}")
     public ResponseEntity<ShopDto> getShop(@PathVariable("id") Long id) {
         ShopDto shop = shopService.getShopById(id);
         return ResponseEntity.ok().body(shop);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/shops")
     public ResponseEntity<ShopDto> addShop(@Valid @RequestBody ShopInputDto shopInputDto) {
         ShopDto savedShop = shopService.addShop(shopInputDto);
@@ -55,25 +52,21 @@ public class ShopController {
         return ResponseEntity.created(location).body(savedShop);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/shops/{id}")
     public ResponseEntity<ShopDto> updateShop(@PathVariable Long id, @RequestBody ShopInputDto shopInputDto) {
         ShopDto updatedShop = shopService.updateShop(id, shopInputDto);
         return ResponseEntity.ok().body(updatedShop);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/shops/{id}")
     public ResponseEntity<ShopDto> updatePartialShop(@PathVariable Long id, @RequestBody ShopInputDto shopInputDto) {
         ShopDto updatedShop = shopService.updatePartialShop(id, shopInputDto);
         return ResponseEntity.ok().body(updatedShop);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteShop(@PathVariable Long id) {
         shopService.deleteShop(id);
         return ResponseEntity.noContent().build();
     }
-
 }

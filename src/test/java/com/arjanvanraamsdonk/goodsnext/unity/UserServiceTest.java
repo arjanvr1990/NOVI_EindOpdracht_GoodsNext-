@@ -1,4 +1,4 @@
-package com.arjanvanraamsdonk.goodsnext;
+package com.arjanvanraamsdonk.goodsnext.unity;
 
 import com.arjanvanraamsdonk.goodsnext.dtos.ContactInfoDto;
 import com.arjanvanraamsdonk.goodsnext.dtos.UserDto;
@@ -37,7 +37,6 @@ class UserServiceTest {
         userService = new UserService(userRepository, passwordEncoder);
     }
 
-    // Helper method to create a UserInputDto
     private UserInputDto createUserInputDto() {
         ContactInfoDto contactInfoDto = new ContactInfoDto(
                 "email@example.com", "City", "1234AB", "Street 1", "0612345678"
@@ -50,7 +49,6 @@ class UserServiceTest {
         return inputDto;
     }
 
-    // Helper method to create a User entity
     private User createUser() {
         ContactInfo contactInfo = new ContactInfo(
                 "email@example.com", "City", "1234AB", "Street 1", "0612345678"
@@ -101,15 +99,12 @@ class UserServiceTest {
 
     @Test
     void testCreateUser_nullInput_throwsIllegalArgumentException() {
-
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> userService.createUser(null)
         );
 
-
         assertEquals("Input data for creating user cannot be null", exception.getMessage());
-
 
         verify(userRepository, never()).save(any(User.class));
         verify(passwordEncoder, never()).encode(anyString());
@@ -131,7 +126,6 @@ class UserServiceTest {
 
     @Test
     void testGetAllUsers_usersExist_returnsListOfUsers() {
-        // Arrange
         User user1 = new User();
         user1.setId(1L);
         user1.setUsername("user1");
@@ -144,9 +138,7 @@ class UserServiceTest {
 
         when(userRepository.findAll()).thenReturn(List.of(user1, user2));
 
-
         List<UserDto> result = userService.getAllUsers();
-
 
         assertNotNull(result);
         assertEquals(2, result.size());
@@ -159,9 +151,7 @@ class UserServiceTest {
 
     @Test
     void testGetAllUsers_noUsersFound_throwsException() {
-
         when(userRepository.findAll()).thenReturn(List.of());
-
 
         assertThrows(RecordNotFoundException.class, () -> userService.getAllUsers());
         verify(userRepository, times(1)).findAll();
@@ -178,7 +168,6 @@ class UserServiceTest {
 
     @Test
     void testUpdateUser_createsContactInfoIfNotExists() {
-        // Arrange
         User existingUser = new User();
         existingUser.setId(1L);
         existingUser.setUsername("existinguser");
@@ -195,14 +184,11 @@ class UserServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
         when(passwordEncoder.encode("newpassword")).thenReturn("encodedNewPassword");
 
-
         userService.updateUser(1L, inputDto);
-
 
         assertEquals("updateduser", existingUser.getUsername());
         assertEquals("encodedNewPassword", existingUser.getPassword());
         assertEquals(Set.of("ROLE_ADMIN"), existingUser.getRoles());
-
 
         assertNotNull(existingUser.getContactInfo());
         assertEquals("test@test.com", existingUser.getContactInfo().getEmail());
@@ -217,7 +203,6 @@ class UserServiceTest {
 
     @Test
     void testUpdateUser_userNotFound_throwsRecordNotFoundException() {
-
         Long userId = 1L;
         UserInputDto inputDto = new UserInputDto();
         inputDto.setUsername("nonexistentuser");

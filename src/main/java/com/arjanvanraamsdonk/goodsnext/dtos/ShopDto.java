@@ -9,7 +9,7 @@ public class ShopDto {
     private String logo;
     private ContactInfoDto contactInfo;
 
-    // Constructor
+
     public ShopDto(Long shopId, String shopName, String logo, ContactInfoDto contactInfo) {
         this.shopId = shopId;
         this.shopName = shopName;
@@ -17,11 +17,11 @@ public class ShopDto {
         this.contactInfo = contactInfo;
     }
 
-    // Default Constructor
+
     public ShopDto() {
     }
 
-    // Getters and Setters
+
     public Long getShopId() {
         return shopId;
     }

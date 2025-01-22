@@ -41,34 +41,27 @@ public class ProductService {
     }
 
     public ProductDto createProduct(ProductInputDto inputDto) {
-        // Controleer of de input null is
         if (inputDto == null) {
             throw new IllegalArgumentException("Input data for creating product cannot be null");
         }
 
-        // Controleer of shopId aanwezig is
         if (inputDto.getShopId() == null) {
             throw new IllegalArgumentException("Shop ID cannot be null");
         }
 
-        // Zoek de shop op basis van het shopId
         Shop shop = shopRepository.findById(inputDto.getShopId())
                 .orElseThrow(() -> new RecordNotFoundException("Shop not found with ID: " + inputDto.getShopId()));
 
-        // Zet het ProductInputDto om naar een Product-entiteit
         Product product = toEntity(inputDto);
 
-        // Koppel de gevonden Shop aan het Product
         if (shop != null) {
             product.setShop(shop);
         } else {
             throw new IllegalArgumentException("Shop object is null. Unable to create product.");
         }
 
-        // Sla het Product op in de database
         Product savedProduct = productRepository.save(product);
 
-        // Converteer het opgeslagen Product naar een DTO en retourneer dit
         return toDto(savedProduct);
     }
 
@@ -93,11 +86,10 @@ public class ProductService {
         }
     }
 
-    // Helper Methods
     private ProductDto toDto(Product product) {
         ProductDto dto = new ProductDto();
         dto.setProductId(product.getId());
-        dto.setShopId(product.getShop() != null ? product.getShop().getShopId() : null); // Voeg shopId mapping toe
+        dto.setShopId(product.getShop() != null ? product.getShop().getShopId() : null);
         dto.setProductName(product.getProductName());
         dto.setProductDescription(product.getProductDescription());
         dto.setProductPrice(product.getProductPrice());

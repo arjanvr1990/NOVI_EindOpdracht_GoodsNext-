@@ -1,7 +1,5 @@
 package com.arjanvanraamsdonk.goodsnext.controllers;
 
-
-
 import com.arjanvanraamsdonk.goodsnext.dtos.AuthenticationRequest;
 import com.arjanvanraamsdonk.goodsnext.dtos.AuthenticationResponse;
 import com.arjanvanraamsdonk.goodsnext.services.CustomUserDetailsService;
@@ -44,11 +42,6 @@ public class AuthenticationController {
 
     @PostMapping("/authenticate")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
-        logger.info("Authenticating user: {}", authenticationRequest.getUsername());
-        logger.info("Endpoint '/authenticate' hit");
-
-
-
         String username = authenticationRequest.getUsername();
         String password = authenticationRequest.getPassword();
 
@@ -65,10 +58,5 @@ public class AuthenticationController {
 
         return ResponseEntity.ok(new AuthenticationResponse(jwt));
     }
-
-
-
-
-
 }
 

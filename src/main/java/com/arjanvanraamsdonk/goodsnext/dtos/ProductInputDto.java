@@ -23,40 +23,29 @@ public class ProductInputDto {
 
     private String productImg;
 
-    // Getters
-    public String getProductName() {
-        return productName;
-    }
 
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
+    public String getProductName() { return productName; }
+
+    public void setProductName(String productName) { this.productName = productName; }
 
     public String getProductDescription() {
         return productDescription;
     }
 
-    public void setProductDescription(String productDescription) {
-        this.productDescription = productDescription;
-    }
+    public void setProductDescription(String productDescription) { this.productDescription = productDescription; }
 
     public Double getProductPrice() {
         return productPrice;
     }
 
-    public void setProductPrice(Double productPrice) {
-        this.productPrice = productPrice;
-    }
+    public void setProductPrice(Double productPrice) { this.productPrice = productPrice; }
 
 
     public Boolean getProductAvailability() {
         return productAvailability;
     }
 
-    public void setProductAvailability(Boolean productAvailability) {
-        this.productAvailability = productAvailability;
-    }
-
+    public void setProductAvailability(Boolean productAvailability) { this.productAvailability = productAvailability; }
 
     public Long getShopId() {
         return shopId;

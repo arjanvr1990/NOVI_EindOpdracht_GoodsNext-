@@ -21,11 +21,11 @@ public class ContactInfoInputDto {
     @NotBlank(message = "Phone number is required")
     private String phoneNumber;
 
-    // Default Constructor
+
     public ContactInfoInputDto() {
     }
 
-    // Constructor
+
     public ContactInfoInputDto(String email, String city, String postalCode, String address, String phoneNumber) {
         this.email = email;
         this.city = city;
@@ -34,44 +34,24 @@ public class ContactInfoInputDto {
         this.phoneNumber = phoneNumber;
     }
 
-    // Getters and Setters
-    public String getEmail() {
-        return email;
-    }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getEmail() { return email; }
 
-    public String getCity() {
-        return city;
-    }
+    public void setEmail(String email) { this.email = email; }
 
-    public void setCity(String city) {
-        this.city = city;
-    }
+    public String getCity() { return city; }
 
-    public String getPostalCode() {
-        return postalCode;
-    }
+    public void setCity(String city) { this.city = city; }
 
-    public void setPostalCode(String postalCode) {
-        this.postalCode = postalCode;
-    }
+    public String getPostalCode() { return postalCode; }
 
-    public String getAddress() {
-        return address;
-    }
+    public void setPostalCode(String postalCode) { this.postalCode = postalCode; }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
+    public String getAddress() { return address; }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
+    public void setAddress(String address) { this.address = address; }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
+    public String getPhoneNumber() { return phoneNumber; }
+
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
 }

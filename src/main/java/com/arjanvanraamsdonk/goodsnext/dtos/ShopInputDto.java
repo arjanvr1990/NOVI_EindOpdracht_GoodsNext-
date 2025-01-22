@@ -9,7 +9,7 @@ public class ShopInputDto {
     private Long logo;
     private ContactInfoDto contactInfo;
 
-    // Getters en Setters
+
     public String getShopName() {
         return shopName;
     }

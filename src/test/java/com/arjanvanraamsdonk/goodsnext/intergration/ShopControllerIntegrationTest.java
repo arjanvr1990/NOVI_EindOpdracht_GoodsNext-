@@ -128,8 +128,6 @@ class ShopControllerIntegrationTest {
 
 
 
-
-
     @Test
     void testUnauthorizedAccess() throws Exception {
         this.mockMvc.perform(get("/api/shops")
