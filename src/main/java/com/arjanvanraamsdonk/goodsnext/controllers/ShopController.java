@@ -68,4 +68,12 @@ public class ShopController {
         ShopDto updatedShop = shopService.updatePartialShop(id, shopInputDto);
         return ResponseEntity.ok().body(updatedShop);
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteShop(@PathVariable Long id) {
+        shopService.deleteShop(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

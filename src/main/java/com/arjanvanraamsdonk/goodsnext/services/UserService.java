@@ -2,17 +2,15 @@ package com.arjanvanraamsdonk.goodsnext.services;
 
 import com.arjanvanraamsdonk.goodsnext.dtos.ContactInfoDto;
 import com.arjanvanraamsdonk.goodsnext.dtos.UserDto;
+import com.arjanvanraamsdonk.goodsnext.dtos.UserInputDto;
 import com.arjanvanraamsdonk.goodsnext.exceptions.RecordNotFoundException;
-import com.arjanvanraamsdonk.goodsnext.models.Authority;
 import com.arjanvanraamsdonk.goodsnext.models.ContactInfo;
 import com.arjanvanraamsdonk.goodsnext.models.User;
 import com.arjanvanraamsdonk.goodsnext.repositories.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,59 +24,84 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-
-
     public List<UserDto> getAllUsers() {
-        return userRepository.findAll().stream()
-                .map(user -> new UserDto(user.getId(), user.getUsername(), user.getRoles()))
-                .collect(Collectors.toList());
+        List<User> users = userRepository.findAll();
+        if (!users.isEmpty()) {
+            return users.stream()
+                    .map(user -> new UserDto(user.getId(), user.getUsername(), user.getRoles()))
+                    .collect(Collectors.toList());
+        } else {
+            throw new RecordNotFoundException("No users found");
+        }
     }
 
     public UserDto getUserById(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("User not found"));
-        return new UserDto(user.getId(), user.getUsername(), null, user.getRoles());
-    }
-
-
-
-    public UserDto createUser(UserDto userDto, ContactInfoDto contactInfoDto) {
-        User user = new User();
-        user.setUsername(userDto.getUsername());
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setRoles(userDto.getRoles());
-
-        // Voeg contactinformatie toe als het aanwezig is
-        if (contactInfoDto != null) {
-            ContactInfo contactInfo = new ContactInfo();
-            contactInfo.setEmail(contactInfoDto.getEmail());
-            contactInfo.setCity(contactInfoDto.getCity());
-            contactInfo.setPostalCode(contactInfoDto.getPostalCode());
-            contactInfo.setAddress(contactInfoDto.getAddress());
-            contactInfo.setPhoneNumber(contactInfoDto.getPhoneNumber());
-            user.setContactInfo(contactInfo);
+        User user = userRepository.findById(id).orElse(null);
+        if (user != null) {
+            return new UserDto(user.getId(), user.getUsername(), null, user.getRoles());
+        } else {
+            throw new RecordNotFoundException("User with ID " + id + " not found");
         }
-
-        userRepository.save(user);
-        return new UserDto(user.getId(), user.getUsername(), null, user.getRoles());
     }
 
+    public UserDto createUser(UserInputDto userInputDto) {
+        if (userInputDto != null) {
+            User user = new User();
+            user.setUsername(userInputDto.getUsername());
+            user.setPassword(passwordEncoder.encode(userInputDto.getPassword()));
+            user.setRoles(userInputDto.getAuthorities().stream().collect(Collectors.toSet()));
 
-    public UserDto updateUser(Long id, UserDto userDto) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("User not found"));
+            if (userInputDto.getContactInfo() != null) {
+                ContactInfo contactInfo = new ContactInfo();
+                contactInfo.setEmail(userInputDto.getContactInfo().getEmail());
+                contactInfo.setCity(userInputDto.getContactInfo().getCity());
+                contactInfo.setPostalCode(userInputDto.getContactInfo().getPostalCode());
+                contactInfo.setAddress(userInputDto.getContactInfo().getAddress());
+                contactInfo.setPhoneNumber(userInputDto.getContactInfo().getPhoneNumber());
+                user.setContactInfo(contactInfo);
+            }
 
-        user.setUsername(userDto.getUsername());
-        if (userDto.getPassword() != null) {
-            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+            User savedUser = userRepository.save(user);
+            return new UserDto(savedUser.getId(), savedUser.getUsername(), null, savedUser.getRoles());
+        } else {
+            throw new IllegalArgumentException("Input data for creating user cannot be null");
         }
-        user.setRoles(userDto.getRoles()); // Rollen bijwerken
-        userRepository.save(user);
-        return new UserDto(user.getId(), user.getUsername(), null, user.getRoles());
     }
 
+    public void updateUser(Long id, UserInputDto userInputDto) {
+        User user = userRepository.findById(id).orElse(null);
+        if (user != null) {
+            user.setUsername(userInputDto.getUsername());
+            if (userInputDto.getPassword() != null) {
+                user.setPassword(passwordEncoder.encode(userInputDto.getPassword()));
+            }
+            user.setRoles(userInputDto.getAuthorities().stream().collect(Collectors.toSet()));
 
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+            if (userInputDto.getContactInfo() != null) {
+                ContactInfo contactInfo = user.getContactInfo();
+                if (contactInfo == null) {
+                    contactInfo = new ContactInfo();
+                    user.setContactInfo(contactInfo);
+                }
+                contactInfo.setEmail(userInputDto.getContactInfo().getEmail());
+                contactInfo.setCity(userInputDto.getContactInfo().getCity());
+                contactInfo.setPostalCode(userInputDto.getContactInfo().getPostalCode());
+                contactInfo.setAddress(userInputDto.getContactInfo().getAddress());
+                contactInfo.setPhoneNumber(userInputDto.getContactInfo().getPhoneNumber());
+            }
+
+            userRepository.save(user);
+        } else {
+            throw new RecordNotFoundException("User with ID " + id + " not found");
+        }
+    }
+
+    public boolean deleteUser(Long id) {
+        if (userRepository.existsById(id)) {
+            userRepository.deleteById(id);
+            return true;
+        } else {
+            throw new RecordNotFoundException("User not found with ID: " + id);
+        }
     }
 }

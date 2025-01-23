@@ -35,7 +35,7 @@ public class SpringSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Nieuwe manier om CSRF uit te schakelen
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/authentication/authenticate").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
@@ -45,11 +45,11 @@ public class SpringSecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasAnyRole("ADMIN")
 
                         .requestMatchers(HttpMethod.GET, "/api/contactinfo").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/contactinfo/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/contactinfo/me").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/contactinfo/{id}").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/contactinfo/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/contactinfo/me").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, "/api/contactinfo/me").hasRole("USER")
-
 
                         .requestMatchers(HttpMethod.GET, "/api/shops/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/shops").hasRole("ADMIN")
@@ -78,7 +78,7 @@ public class SpringSecurityConfig {
                 )
 
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Stateless sessies instellen
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 

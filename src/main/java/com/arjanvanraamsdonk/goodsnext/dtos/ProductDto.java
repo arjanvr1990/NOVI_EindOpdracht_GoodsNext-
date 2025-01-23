@@ -3,14 +3,14 @@ package com.arjanvanraamsdonk.goodsnext.dtos;
 public class ProductDto {
 
     private Long productId;
-    private Long shopId; // Voeg shopId toe
+    private Long shopId;
     private String productName;
     private String productDescription;
     private Double productPrice;
     private Boolean productAvailability;
     private String productImg;
 
-    // Constructor met alle velden, inclusief shopId
+
     public ProductDto(
             Long productId,
             Long shopId,
@@ -28,11 +28,11 @@ public class ProductDto {
         this.productImg = productImg;
     }
 
-    // Default constructor
+
     public ProductDto() {
     }
 
-    // Getters en Setters
+
     public Long getProductId() {
         return productId;
     }

@@ -1,5 +1,6 @@
 package com.arjanvanraamsdonk.goodsnext.services;
 
+
 import com.arjanvanraamsdonk.goodsnext.dtos.ProductDto;
 import com.arjanvanraamsdonk.goodsnext.dtos.ProductInputDto;
 import com.arjanvanraamsdonk.goodsnext.exceptions.RecordNotFoundException;
@@ -10,116 +11,113 @@ import com.arjanvanraamsdonk.goodsnext.repositories.ShopRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final ShopRepository shopRepository;
+    private final ShopRepository shopRepository; // Voeg ShopRepository toe
 
     public ProductService(ProductRepository productRepository, ShopRepository shopRepository) {
         this.productRepository = productRepository;
-        this.shopRepository = shopRepository;
+        this.shopRepository = shopRepository; // Injecteer ShopRepository
     }
 
     public List<ProductDto> getAllProducts() {
-        return productRepository.findAll()
-                .stream()
-                .map(this::transferToDto)
-                .collect(Collectors.toList());
-    }
-
-    public List<ProductDto> getAllProductsByName(String productName) {
-        return productRepository.findAllProductsByProductNameEqualsIgnoreCase(productName)
-                .stream()
-                .map(this::transferToDto)
+        List<Product> products = productRepository.findAll();
+        return products.stream()
+                .map(this::toDto)
                 .collect(Collectors.toList());
     }
 
     public ProductDto getProductById(Long id) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("No product found with id: " + id));
-        return transferToDto(product);
+        Product product = productRepository.findById(id).orElse(null);
+        if (product != null) {
+            return toDto(product);
+        } else {
+            throw new RecordNotFoundException("Product not found with ID: " + id);
+        }
     }
 
-    public ProductDto addProduct(ProductInputDto productInputDto) {
-        Product product = transferToEntity(productInputDto);
+    public ProductDto createProduct(ProductInputDto inputDto) {
+        if (inputDto == null) {
+            throw new IllegalArgumentException("Input data for creating product cannot be null");
+        }
 
-        Shop shop = shopRepository.findById(productInputDto.getShopId())
-                .orElseThrow(() -> new RecordNotFoundException("Shop not found with id: " + productInputDto.getShopId()));
+        // Controleer of shopId niet null is en haal de bijbehorende Shop op
+        if (inputDto.getShopId() == null) {
+            throw new IllegalArgumentException("Shop ID cannot be null");
+        }
+        Shop shop = shopRepository.findById(inputDto.getShopId())
+                .orElseThrow(() -> new RecordNotFoundException("Shop not found with ID: " + inputDto.getShopId()));
+
+        // Zet de input om naar een Product-entiteit
+        Product product = toEntity(inputDto);
+
+        // Koppel de Shop aan het Product
         product.setShop(shop);
 
+        // Sla het product op en retourneer de DTO
         Product savedProduct = productRepository.save(product);
-        return transferToDto(savedProduct);
+        return toDto(savedProduct);
     }
 
-    public ProductDto updateProduct(Long id, ProductInputDto productInputDto) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("No product found with id: " + id));
 
-        product.setProductName(productInputDto.getProductName());
-        product.setProductDescription(productInputDto.getProductDescription());
-        product.setProductPrice(productInputDto.getProductPrice());
-        product.setProductAvailability(productInputDto.getProductAvailability());
-        product.setProductImg(productInputDto.getProductImg());
-
-        Product updatedProduct = productRepository.save(product);
-        return transferToDto(updatedProduct);
-    }
-
-    public ProductDto updatePartialProduct(Long id, ProductInputDto productInputDto) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("No product found with id: " + id));
-
-        if (productInputDto.getProductName() != null) {
-            product.setProductName(productInputDto.getProductName());
+    public ProductDto updateProduct(Long id, ProductInputDto inputDto) {
+        Product product = productRepository.findById(id).orElse(null);
+        if (product != null) {
+            updateProductFields(product, inputDto);
+            Product updatedProduct = productRepository.save(product);
+            return toDto(updatedProduct);
+        } else {
+            throw new RecordNotFoundException("Product not found with ID: " + id);
         }
-        if (productInputDto.getProductDescription() != null) {
-            product.setProductDescription(productInputDto.getProductDescription());
-        }
-        if (productInputDto.getProductPrice() != null) {
-            product.setProductPrice(productInputDto.getProductPrice());
-        }
-        if (productInputDto.getProductAvailability() != null) {
-            product.setProductAvailability(productInputDto.getProductAvailability());
-        }
-        if (productInputDto.getProductImg() != null) {
-            product.setProductImg(productInputDto.getProductImg());
-        }
-
-        Product updatedProduct = productRepository.save(product);
-        return transferToDto(updatedProduct);
     }
 
     public void deleteProduct(Long id) {
-        if (!productRepository.existsById(id)) {
-            throw new RecordNotFoundException("No product found with id: " + id);
+        if (productRepository.existsById(id)) {
+            productRepository.deleteById(id);
+        } else {
+            throw new RecordNotFoundException("Product not found with ID: " + id);
         }
-        productRepository.deleteById(id);
     }
 
-    private ProductDto transferToDto(Product product) {
-        return new ProductDto(
-                product.getId(),
-                product.getShop() != null ? product.getShop().getShopId() : null,
-                product.getProductName(),
-                product.getProductDescription(),
-                product.getProductPrice(),
-                product.getProductAvailability(),
-                product.getProductImg()
-        );
+    // Helper Methods
+    private ProductDto toDto(Product product) {
+        ProductDto dto = new ProductDto();
+        dto.setProductId(product.getId());
+        dto.setProductName(product.getProductName());
+        dto.setProductDescription(product.getProductDescription());
+        dto.setProductPrice(product.getProductPrice());
+        dto.setProductAvailability(product.getProductAvailability());
+        return dto;
     }
 
 
-    private Product transferToEntity(ProductInputDto productInputDto) {
+    private Product toEntity(ProductInputDto inputDto) {
         Product product = new Product();
-        product.setProductName(productInputDto.getProductName());
-        product.setProductDescription(productInputDto.getProductDescription());
-        product.setProductPrice(productInputDto.getProductPrice());
-        product.setProductAvailability(productInputDto.getProductAvailability());
-        product.setProductImg(productInputDto.getProductImg());
+        product.setProductName(inputDto.getProductName());
+        product.setProductDescription(inputDto.getProductDescription());
+        product.setProductPrice(inputDto.getProductPrice());
+        product.setProductAvailability(inputDto.getProductAvailability());
+
+        if (inputDto.getShopId() != null) {
+            Shop shop = shopRepository.findById(inputDto.getShopId())
+                    .orElseThrow(() -> new RecordNotFoundException("Shop not found with ID: " + inputDto.getShopId()));
+            product.setShop(shop);
+        } else {
+            throw new IllegalArgumentException("Shop ID cannot be null");
+        }
+
         return product;
+    }
+
+
+    private void updateProductFields(Product product, ProductInputDto inputDto) {
+        product.setProductName(inputDto.getProductName());
+        product.setProductDescription(inputDto.getProductDescription());
+        product.setProductPrice(inputDto.getProductPrice());
+        product.setProductAvailability(inputDto.getProductAvailability());
     }
 }
