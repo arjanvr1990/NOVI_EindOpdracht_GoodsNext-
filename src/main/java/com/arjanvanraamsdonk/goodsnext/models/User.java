@@ -35,7 +35,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<Authority> authorities = new HashSet<>();
 
-    // Getters and Setters
+
     public Long getId() {
         return id;
     }

@@ -23,11 +23,11 @@ public class ContactInfoDto {
     private String phoneNumber;
 
 
-    // Default Constructor
+
     public ContactInfoDto() {
     }
 
-    // Constructor
+
     public ContactInfoDto(String email, String city, String postalCode, String address, String phoneNumber) {
         this.email = email;
         this.city = city;
@@ -36,7 +36,7 @@ public class ContactInfoDto {
         this.phoneNumber = phoneNumber;
     }
 
-    // Getters and Setters
+
     public String getEmail() {
         return email;
     }

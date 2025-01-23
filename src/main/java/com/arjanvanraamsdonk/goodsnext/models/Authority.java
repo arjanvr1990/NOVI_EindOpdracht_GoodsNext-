@@ -11,7 +11,7 @@ public class Authority implements Serializable {
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false) // Verwijzing naar de primaire sleutel van de `users`-tabel
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Id

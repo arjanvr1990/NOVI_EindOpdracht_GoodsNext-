@@ -31,7 +31,7 @@ public class Shop {
     @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Product> products = new HashSet<>();
 
-    // Getters en Setters
+
     public Long getShopId() {
         return shopId;
     }

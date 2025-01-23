@@ -20,41 +20,24 @@ public class PhotoUpload {
     @Column(name = "file_size", nullable = false)
     private Long fileSize;
 
-    // Getters en setters
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Long getId() { return id; }
 
-    public String getFileName() {
-        return fileName;
-    }
+    public void setId(Long id) { this.id = id; }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
+    public String getFileName() { return fileName; }
 
-    public String getFileType() {
-        return fileType;
-    }
+    public void setFileName(String fileName) { this.fileName = fileName; }
 
-    public void setFileType(String fileType) {
-        this.fileType = fileType;
-    }
+    public String getFileType() { return fileType; }
 
-    public Long getFileSize() {
-        return fileSize;
-    }
+    public void setFileType(String fileType) { this.fileType = fileType; }
 
-    public void setFileSize(Long fileSize) {
-        this.fileSize = fileSize;
-    }
+    public Long getFileSize() { return fileSize; }
 
-    // Getter voor uploadId (zoals vereist)
-    public Long getUploadId() {
-        return id; // uploadId verwijst hier naar het id-veld
-    }
+    public void setFileSize(Long fileSize) { this.fileSize = fileSize; }
+
+    public Long getUploadId() { return id; }
+
+    public void setUploadId(Long fileSize) { this.id = id; }
 }

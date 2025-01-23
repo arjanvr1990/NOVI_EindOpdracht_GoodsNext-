@@ -8,17 +8,17 @@ public class UserDto {
     private String password;
     private Set<String> roles;
 
-    // Lege constructor
+
     public UserDto() {}
 
-    // Constructor zonder wachtwoord
+
     public UserDto(Long id, String username, Set<String> roles) {
         this.id = id;
         this.username = username;
         this.roles = roles;
     }
 
-    // Bestaande constructor met wachtwoord
+
     public UserDto(Long id, String username, String password, Set<String> roles) {
         this.id = id;
         this.username = username;
@@ -28,7 +28,7 @@ public class UserDto {
 
 
 
-    // Getters en Setters
+
     public Long getId() {
         return id;
     }

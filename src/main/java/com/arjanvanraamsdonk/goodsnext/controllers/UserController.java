@@ -28,13 +28,11 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         UserDto user = userService.getUserById(id);
         return ResponseEntity.ok(user);
     }
-
 
     @PostMapping
     public ResponseEntity<UserDto> createUser(
@@ -45,13 +43,11 @@ public class UserController {
         return ResponseEntity.created(location).body(createdUser);
     }
 
-
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateUser(@PathVariable Long id, @Valid @RequestBody UserInputDto userInputDto) {
         userService.updateUser(id, userInputDto);
         return ResponseEntity.ok().build();
     }
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {

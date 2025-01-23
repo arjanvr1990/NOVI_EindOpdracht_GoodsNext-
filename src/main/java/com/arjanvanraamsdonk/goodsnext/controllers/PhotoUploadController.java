@@ -18,8 +18,6 @@ public class PhotoUploadController {
         this.photoUploadService = photoUploadService;
     }
 
-
-
     @GetMapping("/{id}")
     public ResponseEntity<PhotoUploadDto> getPhotoUpload(@PathVariable Long id) {
         PhotoUploadDto photoUpload = photoUploadService.getPhotoUploadById(id);

@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -17,6 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 class ShopControllerIntegrationTest {
 
     @Autowired
@@ -43,12 +45,17 @@ class ShopControllerIntegrationTest {
     void testGetShopById() throws Exception {
         long shopId = 1;
 
-        mockMvc.perform(get("/api/shops/{id}", shopId)
+        this.mockMvc.perform(get("/api/shops/{id}", shopId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.shopId").value(shopId))
-                .andExpect(jsonPath("$.shopName").isNotEmpty());
+                .andExpect(jsonPath("$.shopName").isNotEmpty())
+                .andExpect(jsonPath("$.contactInfo.email").isNotEmpty())
+                .andExpect(jsonPath("$.contactInfo.city").isNotEmpty())
+                .andExpect(jsonPath("$.contactInfo.postalCode").isNotEmpty())
+                .andExpect(jsonPath("$.contactInfo.address").isNotEmpty())
+                .andExpect(jsonPath("$.contactInfo.phoneNumber").isNotEmpty());
     }
 
     @Test
@@ -56,7 +63,6 @@ class ShopControllerIntegrationTest {
     void testAddShop() throws Exception {
         ShopInputDto shopInputDto = new ShopInputDto();
         shopInputDto.setShopName("New Shop");
-        shopInputDto.setLogo(1L);
         shopInputDto.setContactInfo(new ContactInfoDto(
                 "newshop@example.com",
                 "City",
@@ -65,13 +71,31 @@ class ShopControllerIntegrationTest {
                 "0612345678"
         ));
 
-        mockMvc.perform(post("/api/shops")
+        this.mockMvc.perform(post("/api/shops")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(shopInputDto)))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.shopName").value("New Shop"))
-                .andExpect(jsonPath("$.contactInfo.email").value("newshop@example.com"));
+                .andExpect(jsonPath("$.contactInfo.email").value("newshop@example.com"))
+                .andExpect(jsonPath("$.contactInfo.city").value("City"))
+                .andExpect(jsonPath("$.contactInfo.postalCode").value("1234AB"))
+                .andExpect(jsonPath("$.contactInfo.address").value("Street 1"))
+                .andExpect(jsonPath("$.contactInfo.phoneNumber").value("0612345678"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void testAddShop_InvalidInput() throws Exception {
+        ShopInputDto invalidShopInputDto = new ShopInputDto();
+
+        this.mockMvc.perform(post("/api/shops")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidShopInputDto)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.shopName").value("Shop name is mandatory"));
+
     }
 
     @Test
@@ -89,33 +113,24 @@ class ShopControllerIntegrationTest {
                 "0612345679"
         ));
 
-        mockMvc.perform(put("/api/shops/{id}", shopId)
+        this.mockMvc.perform(put("/api/shops/{id}", shopId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(shopInputDto)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.shopName").value("Updated Shop"))
-                .andExpect(jsonPath("$.contactInfo.email").value("updatedshop@example.com"));
+                .andExpect(jsonPath("$.contactInfo.email").value("updatedshop@example.com"))
+                .andExpect(jsonPath("$.contactInfo.city").value("New City"))
+                .andExpect(jsonPath("$.contactInfo.postalCode").value("5678CD"))
+                .andExpect(jsonPath("$.contactInfo.address").value("New Street 123"))
+                .andExpect(jsonPath("$.contactInfo.phoneNumber").value("0612345679"));
     }
 
 
-
-    @Test
-    @WithMockUser(username = "admin", roles = {"ADMIN"})
-    void testAddShop_InvalidInput() throws Exception {
-        ShopInputDto invalidShopInputDto = new ShopInputDto();
-
-        mockMvc.perform(post("/api/shops")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidShopInputDto)))
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.shopName").value("Shop name is mandatory"));
-    }
 
     @Test
     void testUnauthorizedAccess() throws Exception {
-        mockMvc.perform(get("/api/shops")
+        this.mockMvc.perform(get("/api/shops")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isForbidden());

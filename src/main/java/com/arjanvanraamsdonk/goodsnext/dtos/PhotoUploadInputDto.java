@@ -1,11 +1,17 @@
 package com.arjanvanraamsdonk.goodsnext.dtos;
 
+import jakarta.validation.constraints.NotNull;
+
 public class PhotoUploadInputDto {
+
+    @NotNull(message = "fileName name is required")
     private String fileName;
+    @NotNull(message = "fileType name is required")
     private String fileType;
+    @NotNull(message = "fileSize name is required")
     private Long fileSize;
 
-    // Getters and setters
+
     public String getFileName() {
         return fileName;
     }

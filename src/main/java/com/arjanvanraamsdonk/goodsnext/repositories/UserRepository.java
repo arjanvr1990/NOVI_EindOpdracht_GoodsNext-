@@ -11,10 +11,8 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    // Simpele methode om gebruiker te zoeken op basis van username
     Optional<User> findByUsername(String username);
 
-    // Methode met JOIN FETCH om authorities direct te laden
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.authorities WHERE u.username = :username")
     Optional<User> findByUsernameWithAuthorities(@Param("username") String username);
 }
