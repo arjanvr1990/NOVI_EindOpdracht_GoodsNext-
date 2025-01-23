@@ -6,7 +6,6 @@ import com.arjanvanraamsdonk.goodsnext.services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,34 +20,34 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+
     @GetMapping
     public List<ProductDto> getAllProducts() {
         return productService.getAllProducts();
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+
     @GetMapping("/{id}")
     public ResponseEntity<ProductDto> getProductById(@PathVariable Long id) {
         ProductDto product = productService.getProductById(id);
         return ResponseEntity.ok(product);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+
     @PostMapping
     public ResponseEntity<ProductDto> createProduct(@Valid @RequestBody ProductInputDto productInputDto) {
         ProductDto createdProduct = productService.createProduct(productInputDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+
     @PutMapping("/{id}")
     public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id, @RequestBody ProductInputDto productInputDto) {
         ProductDto updatedProduct = productService.updateProduct(id, productInputDto);
         return ResponseEntity.ok(updatedProduct);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);

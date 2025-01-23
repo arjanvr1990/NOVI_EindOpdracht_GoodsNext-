@@ -5,7 +5,6 @@ import com.arjanvanraamsdonk.goodsnext.dtos.ContactInfoInputDto;
 import com.arjanvanraamsdonk.goodsnext.services.ContactInfoService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,24 +30,23 @@ public class ContactInfoController {
         return ResponseEntity.ok(contactInfoService.getContactInfoById(id));
     }
 
-    @PreAuthorize("hasRole('USER')")
     @GetMapping("/me")
     public ResponseEntity<ContactInfoDto> getMyContactInfo() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return ResponseEntity.ok(contactInfoService.getContactInfoByUsername(username));
     }
 
-    @PreAuthorize("hasRole('USER')")
+    @PostMapping
+    public ResponseEntity<ContactInfoDto> addContactInfo(@Valid @RequestBody ContactInfoInputDto inputDto) {
+        return ResponseEntity.ok(contactInfoService.addContactInfo(inputDto));
+    }
+
     @PutMapping("/me")
     public ResponseEntity<ContactInfoDto> updateMyContactInfo(@Valid @RequestBody ContactInfoInputDto inputDto) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return ResponseEntity.ok(contactInfoService.updateContactInfoByUsername(username, inputDto));
     }
 
-    @PostMapping
-    public ResponseEntity<ContactInfoDto> addContactInfo(@Valid @RequestBody ContactInfoInputDto inputDto) {
-        return ResponseEntity.ok(contactInfoService.addContactInfo(inputDto));
-    }
 
     @PutMapping("/{id}")
     public ResponseEntity<ContactInfoDto> updateContactInfo(

@@ -8,7 +8,7 @@ public class ProductDto {
     private String productDescription;
     private Double productPrice;
     private Boolean productAvailability;
-    private String productImg;
+
 
 
     public ProductDto(
@@ -17,15 +17,13 @@ public class ProductDto {
             String productName,
             String productDescription,
             Double productPrice,
-            Boolean productAvailability,
-            String productImg) {
+            Boolean productAvailability) {
         this.productId = productId;
         this.shopId = shopId;
         this.productName = productName;
         this.productDescription = productDescription;
         this.productPrice = productPrice;
         this.productAvailability = productAvailability;
-        this.productImg = productImg;
     }
 
 
@@ -81,11 +79,4 @@ public class ProductDto {
         this.productAvailability = productAvailability;
     }
 
-    public String getProductImg() {
-        return productImg;
-    }
-
-    public void setProductImg(String productImg) {
-        this.productImg = productImg;
-    }
 }

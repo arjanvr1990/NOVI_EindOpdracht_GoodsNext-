@@ -17,11 +17,11 @@ import java.util.stream.Collectors;
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final ShopRepository shopRepository; // Voeg ShopRepository toe
+    private final ShopRepository shopRepository;
 
     public ProductService(ProductRepository productRepository, ShopRepository shopRepository) {
         this.productRepository = productRepository;
-        this.shopRepository = shopRepository; // Injecteer ShopRepository
+        this.shopRepository = shopRepository;
     }
 
     public List<ProductDto> getAllProducts() {
@@ -41,27 +41,37 @@ public class ProductService {
     }
 
     public ProductDto createProduct(ProductInputDto inputDto) {
+        // Controleer of de input null is
         if (inputDto == null) {
             throw new IllegalArgumentException("Input data for creating product cannot be null");
         }
 
-        // Controleer of shopId niet null is en haal de bijbehorende Shop op
+        // Controleer of shopId aanwezig is
         if (inputDto.getShopId() == null) {
             throw new IllegalArgumentException("Shop ID cannot be null");
         }
+
+        // Zoek de shop op basis van het shopId
         Shop shop = shopRepository.findById(inputDto.getShopId())
                 .orElseThrow(() -> new RecordNotFoundException("Shop not found with ID: " + inputDto.getShopId()));
 
-        // Zet de input om naar een Product-entiteit
+        // Zet het ProductInputDto om naar een Product-entiteit
         Product product = toEntity(inputDto);
 
-        // Koppel de Shop aan het Product
-        product.setShop(shop);
+        // Koppel de gevonden Shop aan het Product
+        if (shop != null) {
+            product.setShop(shop);
+        } else {
+            throw new IllegalArgumentException("Shop object is null. Unable to create product.");
+        }
 
-        // Sla het product op en retourneer de DTO
+        // Sla het Product op in de database
         Product savedProduct = productRepository.save(product);
+
+        // Converteer het opgeslagen Product naar een DTO en retourneer dit
         return toDto(savedProduct);
     }
+
 
 
     public ProductDto updateProduct(Long id, ProductInputDto inputDto) {
@@ -87,6 +97,7 @@ public class ProductService {
     private ProductDto toDto(Product product) {
         ProductDto dto = new ProductDto();
         dto.setProductId(product.getId());
+        dto.setShopId(product.getShop() != null ? product.getShop().getShopId() : null); // Voeg shopId mapping toe
         dto.setProductName(product.getProductName());
         dto.setProductDescription(product.getProductDescription());
         dto.setProductPrice(product.getProductPrice());

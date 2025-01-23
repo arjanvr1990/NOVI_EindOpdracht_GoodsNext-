@@ -16,11 +16,11 @@ public class ContactInfo {
     private String address;
     private String phoneNumber;
 
-    // Default Constructor
+
     public ContactInfo() {
     }
 
-    // Constructor
+
     public ContactInfo(String email, String city, String postalCode, String address, String phoneNumber) {
         this.email = email;
         this.city = city;
@@ -29,7 +29,7 @@ public class ContactInfo {
         this.phoneNumber = phoneNumber;
     }
 
-    // Getters and Setters
+
     public Long getId() {
         return id;
     }
