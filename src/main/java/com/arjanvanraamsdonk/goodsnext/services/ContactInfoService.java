@@ -105,6 +105,18 @@ public class ContactInfoService {
 
     public ContactInfoDto addContactInfo(ContactInfoInputDto contactInfoInputDto) {
         if (contactInfoInputDto != null) {
+            if (contactInfoRepository.findByEmail(contactInfoInputDto.getEmail()).isPresent()) {
+                throw new IllegalArgumentException("Contact info with email " + contactInfoInputDto.getEmail() + " already exists.");
+            }
+
+            if (contactInfoRepository.findByAddress(contactInfoInputDto.getAddress()).isPresent()) {
+                throw new IllegalArgumentException("Contact info with address " + contactInfoInputDto.getAddress() + " already exists.");
+            }
+
+            if (contactInfoRepository.findByPhoneNumber(contactInfoInputDto.getPhoneNumber()).isPresent()) {
+                throw new IllegalArgumentException("Contact info with phone number " + contactInfoInputDto.getPhoneNumber() + " already exists.");
+            }
+
             ContactInfo contactInfo = new ContactInfo();
             contactInfo.setEmail(contactInfoInputDto.getEmail());
             contactInfo.setCity(contactInfoInputDto.getCity());
@@ -125,6 +137,7 @@ public class ContactInfoService {
             throw new IllegalArgumentException("Input data for creating contact info cannot be null");
         }
     }
+
 
 
     public ContactInfoDto updateContactInfo(Long id, ContactInfoInputDto contactInfoInputDto) {
