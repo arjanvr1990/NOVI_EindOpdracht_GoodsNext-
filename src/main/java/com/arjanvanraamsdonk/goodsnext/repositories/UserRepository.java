@@ -15,6 +15,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.authorities WHERE u.username = :username")
     Optional<User> findByUsernameWithAuthorities(@Param("username") String username);
+
+    @Query("SELECT CASE WHEN COUNT(u) > 0 THEN TRUE ELSE FALSE END FROM User u WHERE u.contactInfo.id = :contactInfoId")
+    boolean existsByContactInfoId(@Param("contactInfoId") Long contactInfoId);
+
+    @Query("SELECT u FROM User u WHERE u.contactInfo.id = :contactInfoId")
+    User findByContactInfoId(@Param("contactInfoId") Long contactInfoId);
 }
 
 

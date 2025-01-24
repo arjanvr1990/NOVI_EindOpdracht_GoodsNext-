@@ -54,6 +54,7 @@ public class ContactInfoController {
         return ResponseEntity.ok(contactInfoService.updateContactInfo(id, inputDto));
     }
 
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteContactInfo(@PathVariable Long id) {
         contactInfoService.deleteContactInfo(id);
