@@ -19,15 +19,6 @@ public class PhotoUploadService {
         this.photoUploadRepository = photoUploadRepository;
     }
 
-    public PhotoUploadDto createPhotoUpload(PhotoUploadInputDto inputDto) {
-        if (inputDto != null) {
-            PhotoUpload photoUpload = toEntity(inputDto);
-            PhotoUpload savedPhotoUpload = photoUploadRepository.save(photoUpload);
-            return toDto(savedPhotoUpload);
-        } else {
-            throw new IllegalArgumentException("Input data for creating PhotoUpload cannot be null");
-        }
-    }
 
     public PhotoUploadDto getPhotoUploadById(Long id) {
         PhotoUpload photoUpload = photoUploadRepository.findById(id).orElse(null);
@@ -42,6 +33,30 @@ public class PhotoUploadService {
         List<PhotoUpload> photoUploads = photoUploadRepository.findAll();
         return photoUploads.stream().map(this::toDto).collect(Collectors.toList());
     }
+
+    public PhotoUploadDto createPhotoUpload(PhotoUploadInputDto inputDto) {
+        if (inputDto == null) {
+            throw new IllegalArgumentException("Input data for creating photo upload cannot be null");
+        }
+
+        if (photoUploadRepository.findByFileName(inputDto.getFileName()).isPresent()) {
+            throw new IllegalArgumentException("File with name " + inputDto.getFileName() + " already exists.");
+        }
+
+        PhotoUpload photoUpload = new PhotoUpload();
+        photoUpload.setFileName(inputDto.getFileName());
+        photoUpload.setFileType(inputDto.getFileType());
+        photoUpload.setFileSize(inputDto.getFileSize());
+
+        photoUploadRepository.save(photoUpload);
+
+        PhotoUploadDto dto = new PhotoUploadDto();
+        dto.setFileName(photoUpload.getFileName());
+        dto.setFileType(photoUpload.getFileType());
+        dto.setFileSize(photoUpload.getFileSize());
+        return dto;
+    }
+
 
     public PhotoUploadDto updatePhotoUpload(Long id, PhotoUploadInputDto inputDto) {
         PhotoUpload photoUpload = photoUploadRepository.findById(id).orElse(null);
