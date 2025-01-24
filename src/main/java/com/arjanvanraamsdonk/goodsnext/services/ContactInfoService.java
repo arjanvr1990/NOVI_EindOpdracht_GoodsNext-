@@ -2,10 +2,13 @@ package com.arjanvanraamsdonk.goodsnext.services;
 
 import com.arjanvanraamsdonk.goodsnext.dtos.ContactInfoDto;
 import com.arjanvanraamsdonk.goodsnext.dtos.ContactInfoInputDto;
+import com.arjanvanraamsdonk.goodsnext.exceptions.ContactInfoInUseException;
 import com.arjanvanraamsdonk.goodsnext.exceptions.RecordNotFoundException;
 import com.arjanvanraamsdonk.goodsnext.models.ContactInfo;
+import com.arjanvanraamsdonk.goodsnext.models.Shop;
 import com.arjanvanraamsdonk.goodsnext.models.User;
 import com.arjanvanraamsdonk.goodsnext.repositories.ContactInfoRepository;
+import com.arjanvanraamsdonk.goodsnext.repositories.ShopRepository;
 import com.arjanvanraamsdonk.goodsnext.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +20,12 @@ public class ContactInfoService {
 
     private final ContactInfoRepository contactInfoRepository;
     private final UserRepository userRepository;
+    private final ShopRepository shopRepository;
 
-    public ContactInfoService(ContactInfoRepository contactInfoRepository, UserRepository userRepository) {
+    public ContactInfoService(ContactInfoRepository contactInfoRepository, UserRepository userRepository, ShopRepository shopRepository) {
         this.contactInfoRepository = contactInfoRepository;
         this.userRepository = userRepository;
+        this.shopRepository = shopRepository;
     }
 
     public List<ContactInfoDto> getAllContactInfo() {
@@ -100,6 +105,18 @@ public class ContactInfoService {
 
     public ContactInfoDto addContactInfo(ContactInfoInputDto contactInfoInputDto) {
         if (contactInfoInputDto != null) {
+            if (contactInfoRepository.findByEmail(contactInfoInputDto.getEmail()).isPresent()) {
+                throw new IllegalArgumentException("Contact info with email " + contactInfoInputDto.getEmail() + " already exists.");
+            }
+
+            if (contactInfoRepository.findByAddress(contactInfoInputDto.getAddress()).isPresent()) {
+                throw new IllegalArgumentException("Contact info with address " + contactInfoInputDto.getAddress() + " already exists.");
+            }
+
+            if (contactInfoRepository.findByPhoneNumber(contactInfoInputDto.getPhoneNumber()).isPresent()) {
+                throw new IllegalArgumentException("Contact info with phone number " + contactInfoInputDto.getPhoneNumber() + " already exists.");
+            }
+
             ContactInfo contactInfo = new ContactInfo();
             contactInfo.setEmail(contactInfoInputDto.getEmail());
             contactInfo.setCity(contactInfoInputDto.getCity());
@@ -120,6 +137,7 @@ public class ContactInfoService {
             throw new IllegalArgumentException("Input data for creating contact info cannot be null");
         }
     }
+
 
 
     public ContactInfoDto updateContactInfo(Long id, ContactInfoInputDto contactInfoInputDto) {
@@ -146,13 +164,25 @@ public class ContactInfoService {
     }
 
 
+
     public void deleteContactInfo(Long id) {
+        if (userRepository.existsByContactInfoId(id)) {
+            User user = userRepository.findByContactInfoId(id);
+            throw new ContactInfoInUseException("ContactInfo is connected to user (User ID: " + user.getId() + "). Delete this user and it deletes as well the ContactInfo");
+        }
+
+        if (shopRepository.existsByContactInfoId(id)) {
+            Shop shop = shopRepository.findByContactInfoId(id);
+            throw new ContactInfoInUseException("ContactInfo is connected to shop (Shop ID: " + shop.getShopId() + "). Delete this shop and it deletes as well the ContactInfo");
+        }
+
         if (contactInfoRepository.existsById(id)) {
             contactInfoRepository.deleteById(id);
         } else {
             throw new RecordNotFoundException("No ContactInfo found with id: " + id);
         }
     }
+
 
     private ContactInfoDto fromContactInfo(ContactInfo contactInfo) {
         ContactInfoDto dto = new ContactInfoDto();

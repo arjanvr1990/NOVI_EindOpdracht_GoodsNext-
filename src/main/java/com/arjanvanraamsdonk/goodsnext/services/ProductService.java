@@ -11,6 +11,7 @@ import com.arjanvanraamsdonk.goodsnext.repositories.ShopRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,18 +53,20 @@ public class ProductService {
         Shop shop = shopRepository.findById(inputDto.getShopId())
                 .orElseThrow(() -> new RecordNotFoundException("Shop not found with ID: " + inputDto.getShopId()));
 
+        Optional<Product> existingProduct = productRepository.findByShopAndProductName(shop, inputDto.getProductName());
+        if (existingProduct.isPresent()) {
+            throw new IllegalArgumentException("Product with name " + inputDto.getProductName() + " already exists in this shop.");
+        }
+
         Product product = toEntity(inputDto);
 
-        if (shop != null) {
-            product.setShop(shop);
-        } else {
-            throw new IllegalArgumentException("Shop object is null. Unable to create product.");
-        }
+        product.setShop(shop);
 
         Product savedProduct = productRepository.save(product);
 
         return toDto(savedProduct);
     }
+
 
 
 

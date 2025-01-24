@@ -1,5 +1,7 @@
 package com.arjanvanraamsdonk.goodsnext.dtos;
 
+import com.arjanvanraamsdonk.goodsnext.models.ContactInfo;
+
 import java.util.Set;
 
 public class UserDto {
@@ -7,15 +9,18 @@ public class UserDto {
     private String username;
     private String password;
     private Set<String> roles;
+    private ContactInfo contactInfo;
 
 
     public UserDto() {}
 
 
-    public UserDto(Long id, String username, Set<String> roles) {
+    public UserDto(Long id, String username, Set<String> roles, ContactInfo contactInfo) {
         this.id = id;
         this.username = username;
         this.roles = roles;
+
+        this.contactInfo = contactInfo;
     }
 
 
@@ -25,6 +30,8 @@ public class UserDto {
         this.password = password;
         this.roles = roles;
     }
+
+
 
 
 

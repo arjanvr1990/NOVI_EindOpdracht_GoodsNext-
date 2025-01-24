@@ -37,16 +37,23 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserDto> createUser(
             @Valid @RequestBody UserInputDto userInputDto) {
+        System.out.println("POST request received for creating user: " + userInputDto);
         UserDto createdUser = userService.createUser(userInputDto);
 
         URI location = URI.create(String.format("/api/users/%d", createdUser.getId()));
         return ResponseEntity.created(location).body(createdUser);
     }
 
+//    @PutMapping("/{id}")
+//    public ResponseEntity<Void> updateUser(@PathVariable Long id, @Valid @RequestBody UserInputDto userInputDto) {
+//        userService.updateUser(id, userInputDto);
+//        return ResponseEntity.ok().build();
+//    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateUser(@PathVariable Long id, @Valid @RequestBody UserInputDto userInputDto) {
-        userService.updateUser(id, userInputDto);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserInputDto userInputDto) {
+        UserDto updatedUser = userService.updateUser(id, userInputDto);
+        return ResponseEntity.ok(updatedUser);  // Stuur de bijgewerkte gebruiker terug met 200 OK
     }
 
     @DeleteMapping("/{id}")

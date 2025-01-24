@@ -169,6 +169,24 @@ class ShopServiceTest {
         verify(photoUploadRepository, never()).findById(anyLong());
     }
 
+    @Test
+    void testAddShop_duplicateShopThrowsException() {
+        ShopInputDto shopInputDto = new ShopInputDto();
+        shopInputDto.setShopName("Existing Shop");
+        shopInputDto.setLogo(1L);
+
+        when(shopRepository.findByShopNameContainingIgnoreCase("Existing Shop")).thenReturn(List.of(new Shop()));
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            shopService.addShop(shopInputDto);
+        });
+
+        assertEquals("Shop with name Existing Shop already exists.", exception.getMessage());
+
+        verify(shopRepository, times(1)).findByShopNameContainingIgnoreCase("Existing Shop");
+    }
+
+
 
     @Test
     void testUpdateShop_updatesShop() {

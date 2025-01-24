@@ -1,5 +1,6 @@
 package com.arjanvanraamsdonk.goodsnext.controllers;
 
+import com.arjanvanraamsdonk.goodsnext.exceptions.ContactInfoInUseException;
 import com.arjanvanraamsdonk.goodsnext.exceptions.ProductNameTooLongException;
 import com.arjanvanraamsdonk.goodsnext.exceptions.RecordNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,11 @@ public class ExceptionController {
     @ExceptionHandler(value = ProductNameTooLongException.class)
     public ResponseEntity<String> exception(ProductNameTooLongException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ContactInfoInUseException.class)
+    public ResponseEntity<String> handleContactInfoInUseException(ContactInfoInUseException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 }
 

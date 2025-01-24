@@ -49,25 +49,49 @@ public class ShopService {
         }
     }
 
-    public ShopDto addShop(ShopInputDto shopInputDto) {
-        if (shopInputDto != null) {
-            Shop shop = toShop(shopInputDto);
-
-            if (shopInputDto.getLogo() != null) {
-                PhotoUpload logo = photoUploadRepository.findById(shopInputDto.getLogo()).orElse(null);
-                if (logo != null) {
-                    shop.setLogo(logo);
-                } else {
-                    throw new RecordNotFoundException("PhotoUpload not found with ID: " + shopInputDto.getLogo());
-                }
-            }
-
-            Shop savedShop = shopRepository.save(shop);
-            return fromShop(savedShop);
-        } else {
-            throw new IllegalArgumentException("Input data for creating shop cannot be null");
+//    public ShopDto addShop(ShopInputDto shopInputDto) {
+//        if (shopInputDto != null) {
+//            Shop shop = toShop(shopInputDto);
+//
+//            if (shopInputDto.getLogo() != null) {
+//                PhotoUpload logo = photoUploadRepository.findById(shopInputDto.getLogo()).orElse(null);
+//                if (logo != null) {
+//                    shop.setLogo(logo);
+//                } else {
+//                    throw new RecordNotFoundException("PhotoUpload not found with ID: " + shopInputDto.getLogo());
+//                }
+//            }
+//
+//            Shop savedShop = shopRepository.save(shop);
+//            return fromShop(savedShop);
+//        } else {
+//            throw new IllegalArgumentException("Input data for creating shop cannot be null");
+//        }
+//    }
+public ShopDto addShop(ShopInputDto shopInputDto) {
+    if (shopInputDto != null) {
+        if (!shopRepository.findByShopNameContainingIgnoreCase(shopInputDto.getShopName()).isEmpty()) {
+            throw new IllegalArgumentException("Shop with name " + shopInputDto.getShopName() + " already exists.");
         }
+
+        Shop shop = toShop(shopInputDto);
+
+        if (shopInputDto.getLogo() != null) {
+            PhotoUpload logo = photoUploadRepository.findById(shopInputDto.getLogo()).orElse(null);
+            if (logo != null) {
+                shop.setLogo(logo);
+            } else {
+                throw new RecordNotFoundException("PhotoUpload not found with ID: " + shopInputDto.getLogo());
+            }
+        }
+
+        Shop savedShop = shopRepository.save(shop);
+        return fromShop(savedShop);
+    } else {
+        throw new IllegalArgumentException("Input data for creating shop cannot be null");
     }
+}
+
 
 
     public ShopDto updateShop(Long id, ShopInputDto shopInputDto) {

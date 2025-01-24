@@ -13,7 +13,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/shops")
 public class ShopController {
 
     private final ShopService shopService;
@@ -22,7 +22,7 @@ public class ShopController {
         this.shopService = shopService;
     }
 
-    @GetMapping("/shops")
+    @GetMapping
     public ResponseEntity<List<ShopDto>> getAllShops(@RequestParam(value = "shopName", required = false) String shopName) {
         List<ShopDto> shops;
         if (shopName == null) {
@@ -33,13 +33,13 @@ public class ShopController {
         return ResponseEntity.ok().body(shops);
     }
 
-    @GetMapping("/shops/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ShopDto> getShop(@PathVariable("id") Long id) {
         ShopDto shop = shopService.getShopById(id);
         return ResponseEntity.ok().body(shop);
     }
 
-    @PostMapping("/shops")
+    @PostMapping
     public ResponseEntity<ShopDto> addShop(@Valid @RequestBody ShopInputDto shopInputDto) {
         ShopDto savedShop = shopService.addShop(shopInputDto);
 
@@ -52,13 +52,13 @@ public class ShopController {
         return ResponseEntity.created(location).body(savedShop);
     }
 
-    @PutMapping("/shops/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<ShopDto> updateShop(@PathVariable Long id, @RequestBody ShopInputDto shopInputDto) {
         ShopDto updatedShop = shopService.updateShop(id, shopInputDto);
         return ResponseEntity.ok().body(updatedShop);
     }
 
-    @PatchMapping("/shops/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<ShopDto> updatePartialShop(@PathVariable Long id, @RequestBody ShopInputDto shopInputDto) {
         ShopDto updatedShop = shopService.updatePartialShop(id, shopInputDto);
         return ResponseEntity.ok().body(updatedShop);
