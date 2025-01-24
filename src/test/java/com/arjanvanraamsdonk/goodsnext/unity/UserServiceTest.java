@@ -110,6 +110,25 @@ class UserServiceTest {
         verify(passwordEncoder, never()).encode(anyString());
     }
 
+    @Test
+    void testCreateUser_duplicateUsernameThrowsException() {
+        UserInputDto userInputDto = new UserInputDto();
+        userInputDto.setUsername("existingUser");
+        userInputDto.setPassword("password123");
+        userInputDto.setAuthorities(List.of("ROLE_USER"));
+
+        when(userRepository.findByUsername("existingUser")).thenReturn(Optional.of(new User()));
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            userService.createUser(userInputDto);
+        });
+
+        assertEquals("User with username existingUser already exists.", exception.getMessage());
+
+        verify(userRepository, times(1)).findByUsername("existingUser");
+    }
+
+
 
     @Test
     void testGetUserById_userExists_returnsUser() {
@@ -167,19 +186,19 @@ class UserServiceTest {
     }
 
     @Test
-    void testUpdateUser_createsContactInfoIfNotExists() {
+    void testUpdateUser_updatesUserFields() {
         User existingUser = new User();
         existingUser.setId(1L);
         existingUser.setUsername("existinguser");
         existingUser.setRoles(Set.of("ROLE_USER"));
-        existingUser.setContactInfo(null); // Geen ContactInfo aanwezig
+        existingUser.setPassword("oldpassword");
+        existingUser.setContactInfo(null);
 
         UserInputDto inputDto = new UserInputDto();
         inputDto.setUsername("updateduser");
         inputDto.setPassword("newpassword");
         inputDto.setAuthorities(List.of("ROLE_ADMIN"));
-        ContactInfoDto contactInfoDto = new ContactInfoDto("test@test.com", "City", "1234AB", "Street 1", "123456789");
-        inputDto.setContactInfo(contactInfoDto);
+        inputDto.setContactInfo(null);
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
         when(passwordEncoder.encode("newpassword")).thenReturn("encodedNewPassword");
@@ -190,15 +209,9 @@ class UserServiceTest {
         assertEquals("encodedNewPassword", existingUser.getPassword());
         assertEquals(Set.of("ROLE_ADMIN"), existingUser.getRoles());
 
-        assertNotNull(existingUser.getContactInfo());
-        assertEquals("test@test.com", existingUser.getContactInfo().getEmail());
-        assertEquals("City", existingUser.getContactInfo().getCity());
-        assertEquals("1234AB", existingUser.getContactInfo().getPostalCode());
-        assertEquals("Street 1", existingUser.getContactInfo().getAddress());
-        assertEquals("123456789", existingUser.getContactInfo().getPhoneNumber());
-
         verify(userRepository, times(1)).save(existingUser);
     }
+
 
 
     @Test

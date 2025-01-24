@@ -1,5 +1,6 @@
 package com.arjanvanraamsdonk.goodsnext.services;
 
+import com.arjanvanraamsdonk.goodsnext.dtos.ContactInfoDto;
 import com.arjanvanraamsdonk.goodsnext.dtos.UserDto;
 import com.arjanvanraamsdonk.goodsnext.dtos.UserInputDto;
 import com.arjanvanraamsdonk.goodsnext.exceptions.RecordNotFoundException;
@@ -27,7 +28,7 @@ public class UserService {
         List<User> users = userRepository.findAll();
         if (!users.isEmpty()) {
             return users.stream()
-                    .map(user -> new UserDto(user.getId(), user.getUsername(), user.getRoles()))
+                    .map(user -> new UserDto(user.getId(), user.getUsername(), user.getRoles(), user.getContactInfo()))
                     .collect(Collectors.toList());
         } else {
             throw new RecordNotFoundException("No users found");
@@ -45,6 +46,10 @@ public class UserService {
 
     public UserDto createUser(UserInputDto userInputDto) {
         if (userInputDto != null) {
+            if (userRepository.findByUsername(userInputDto.getUsername()).isPresent()) {
+                throw new IllegalArgumentException("User with username " + userInputDto.getUsername() + " already exists.");
+            }
+
             User user = new User();
             user.setUsername(userInputDto.getUsername());
             user.setPassword(passwordEncoder.encode(userInputDto.getPassword()));
@@ -69,30 +74,26 @@ public class UserService {
 
 
 
+
     public UserDto updateUser(Long id, UserInputDto userInputDto) {
         User user = userRepository.findById(id).orElse(null);
+
         if (user != null) {
             user.setUsername(userInputDto.getUsername());
+
             if (userInputDto.getPassword() != null) {
                 user.setPassword(passwordEncoder.encode(userInputDto.getPassword()));
             }
             user.setRoles(userInputDto.getAuthorities().stream().collect(Collectors.toSet()));
 
-            if (userInputDto.getContactInfo() != null) {
-                ContactInfo contactInfo = user.getContactInfo();
-                if (contactInfo == null) {
-                    contactInfo = new ContactInfo();
-                    user.setContactInfo(contactInfo);
-                }
-            }
-
             userRepository.save(user);
 
-            return new UserDto(user.getId(), user.getUsername(), user.getRoles());
+            return new UserDto(user.getId(), user.getUsername(), user.getRoles(), user.getContactInfo());
         } else {
             throw new RecordNotFoundException("User with ID " + id + " not found");
         }
     }
+
 
 
 
