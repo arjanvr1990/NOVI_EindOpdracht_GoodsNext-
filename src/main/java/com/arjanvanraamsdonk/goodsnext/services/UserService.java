@@ -1,6 +1,5 @@
 package com.arjanvanraamsdonk.goodsnext.services;
 
-import com.arjanvanraamsdonk.goodsnext.dtos.ContactInfoDto;
 import com.arjanvanraamsdonk.goodsnext.dtos.UserDto;
 import com.arjanvanraamsdonk.goodsnext.dtos.UserInputDto;
 import com.arjanvanraamsdonk.goodsnext.exceptions.RecordNotFoundException;
@@ -68,7 +67,9 @@ public class UserService {
         }
     }
 
-    public void updateUser(Long id, UserInputDto userInputDto) {
+
+
+    public UserDto updateUser(Long id, UserInputDto userInputDto) {
         User user = userRepository.findById(id).orElse(null);
         if (user != null) {
             user.setUsername(userInputDto.getUsername());
@@ -83,18 +84,17 @@ public class UserService {
                     contactInfo = new ContactInfo();
                     user.setContactInfo(contactInfo);
                 }
-                contactInfo.setEmail(userInputDto.getContactInfo().getEmail());
-                contactInfo.setCity(userInputDto.getContactInfo().getCity());
-                contactInfo.setPostalCode(userInputDto.getContactInfo().getPostalCode());
-                contactInfo.setAddress(userInputDto.getContactInfo().getAddress());
-                contactInfo.setPhoneNumber(userInputDto.getContactInfo().getPhoneNumber());
             }
 
             userRepository.save(user);
+
+            return new UserDto(user.getId(), user.getUsername(), user.getRoles());
         } else {
             throw new RecordNotFoundException("User with ID " + id + " not found");
         }
     }
+
+
 
     public boolean deleteUser(Long id) {
         if (userRepository.existsById(id)) {

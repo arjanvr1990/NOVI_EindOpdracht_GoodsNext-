@@ -9,6 +9,7 @@ public class UserDto {
     private Set<String> roles;
 
 
+
     public UserDto() {}
 
 
@@ -25,6 +26,8 @@ public class UserDto {
         this.password = password;
         this.roles = roles;
     }
+
+
 
 
 
